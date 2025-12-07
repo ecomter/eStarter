@@ -20,19 +20,39 @@ namespace eStarter.ViewModels
         public ICommand ChangeTileColorCommand { get; }
 
         private readonly AppManager _manager;
+        private readonly ISettingsService _settingsService;
 
         public MainViewModel()
         {
             var installer = new AppInstaller();
             _manager = new AppManager(installer);
+            _settingsService = new SettingsService();
 
             RefreshCommand = new RelayCommand(_ => Refresh());
             InstallCommand = new RelayCommand(async _ => await InstallAsync());
             LaunchCommand = new RelayCommand(param => LaunchApp((param as AppEntry)?.Id));
-            ChangeTileSizeCommand = new RelayCommand(param => ChangeTileSize(param as AppEntry));
-            ChangeTileColorCommand = new RelayCommand(param => ChangeTileColor(param as AppEntry));
+            ChangeTileSizeCommand = new RelayCommand(async param => await ChangeTileSizeAsync(param as AppEntry));
+            ChangeTileColorCommand = new RelayCommand(async param => await ChangeTileColorAsync(param as AppEntry));
 
-            Refresh();
+            _ = InitializeAsync();
+        }
+
+        private async Task InitializeAsync()
+        {
+            // Try to load saved configuration first
+            var savedApps = await _settingsService.LoadTileConfigurationAsync();
+            var savedList = savedApps.ToList();
+            
+            if (savedList.Any())
+            {
+                foreach (var app in savedList)
+                    InstalledApps.Add(app);
+            }
+            else
+            {
+                // No saved config, load defaults
+                Refresh();
+            }
         }
 
         private void Refresh()
@@ -41,7 +61,7 @@ namespace eStarter.ViewModels
             foreach (var app in _manager.GetInstalledApps())
                 InstalledApps.Add(new AppEntry { Id = app, Name = app });
 
-            // Add demo tiles if empty with varied sizes and colors (Windows 8/10 style)
+            // Add demo tiles if empty with varied sizes and colors (Metro style)
             if (!InstalledApps.Any())
             {
                 InstalledApps.Add(new AppEntry 
@@ -129,6 +149,7 @@ namespace eStarter.ViewModels
             {
                 await _manager.InstallAsync(candidate);
                 Refresh();
+                await SaveSettingsAsync();
             }
         }
 
@@ -161,7 +182,7 @@ namespace eStarter.ViewModels
             }
         }
 
-        private void ChangeTileSize(AppEntry? app)
+        private async Task ChangeTileSizeAsync(AppEntry? app)
         {
             if (app == null) return;
 
@@ -174,9 +195,11 @@ namespace eStarter.ViewModels
                 TileSize.Large => TileSize.Small,
                 _ => TileSize.Medium
             };
+
+            await SaveSettingsAsync();
         }
 
-        private void ChangeTileColor(AppEntry? app)
+        private async Task ChangeTileColorAsync(AppEntry? app)
         {
             if (app == null) return;
 
@@ -190,6 +213,13 @@ namespace eStarter.ViewModels
 
             var currentIndex = System.Array.IndexOf(colors, app.Background);
             app.Background = colors[(currentIndex + 1) % colors.Length];
+
+            await SaveSettingsAsync();
+        }
+
+        private async Task SaveSettingsAsync()
+        {
+            await _settingsService.SaveTileConfigurationAsync(InstalledApps);
         }
     }
 }
