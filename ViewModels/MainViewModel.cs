@@ -16,19 +16,44 @@ namespace eStarter.ViewModels
         public ICommand RefreshCommand { get; }
         public ICommand InstallCommand { get; }
         public ICommand LaunchCommand { get; }
+        public ICommand ChangeTileSizeCommand { get; }
+        public ICommand ChangeTileColorCommand { get; }
 
         private readonly AppManager _manager;
+        private readonly ISettingsService _settingsService;
 
         public MainViewModel()
         {
             var installer = new AppInstaller();
             _manager = new AppManager(installer);
+            _settingsService = new SettingsService();
 
             RefreshCommand = new RelayCommand(_ => Refresh());
             InstallCommand = new RelayCommand(async _ => await InstallAsync());
             LaunchCommand = new RelayCommand(param => LaunchApp((param as AppEntry)?.Id));
+            ChangeTileSizeCommand = new RelayCommand(async param => await ChangeTileSizeAsync(param as AppEntry));
+            ChangeTileColorCommand = new RelayCommand(async param => await ChangeTileColorAsync(param as AppEntry));
 
-            Refresh();
+            // Initialize async but handle exceptions properly
+            Task.Run(async () => await InitializeAsync());
+        }
+
+        private async Task InitializeAsync()
+        {
+            // Try to load saved configuration first
+            var savedApps = await _settingsService.LoadTileConfigurationAsync();
+            var savedList = savedApps.ToList();
+            
+            if (savedList.Any())
+            {
+                foreach (var app in savedList)
+                    InstalledApps.Add(app);
+            }
+            else
+            {
+                // No saved config, load defaults
+                Refresh();
+            }
         }
 
         private void Refresh()
@@ -37,9 +62,83 @@ namespace eStarter.ViewModels
             foreach (var app in _manager.GetInstalledApps())
                 InstalledApps.Add(new AppEntry { Id = app, Name = app });
 
-            // Add demo tile if empty
+            // Add demo tiles if empty with varied sizes and colors (Metro style)
             if (!InstalledApps.Any())
-                InstalledApps.Add(new AppEntry { Id = "demo.calc", Name = "Calculator", Description = "Demo calculator", BadgeCount = 3, Background = "#FF4CAF50" });
+            {
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.mail", 
+                    Name = "Mail", 
+                    Description = "Your messages", 
+                    BadgeCount = 5, 
+                    Background = "#FF0078D7",
+                    TileSize = TileSize.Medium
+                });
+                
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.calendar", 
+                    Name = "Calendar", 
+                    Description = "Stay organized", 
+                    Background = "#FF1BA1E2",
+                    TileSize = TileSize.Medium
+                });
+                
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.photos", 
+                    Name = "Photos", 
+                    Description = "Your memories", 
+                    Background = "#FFD24726",
+                    TileSize = TileSize.Wide
+                });
+                
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.music", 
+                    Name = "Music", 
+                    Description = "Groove to your favorites", 
+                    Background = "#FFF09609",
+                    TileSize = TileSize.Medium
+                });
+                
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.store", 
+                    Name = "Store", 
+                    Description = "Get apps", 
+                    Background = "#FF00A1F1",
+                    TileSize = TileSize.Medium
+                });
+                
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.news", 
+                    Name = "News", 
+                    Description = "Stay informed", 
+                    BadgeCount = 12,
+                    Background = "#FF7E3878",
+                    TileSize = TileSize.Wide
+                });
+                
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.weather", 
+                    Name = "Weather", 
+                    Description = "72° Sunny", 
+                    Background = "#FF00ABA9",
+                    TileSize = TileSize.Medium
+                });
+                
+                InstalledApps.Add(new AppEntry 
+                { 
+                    Id = "demo.settings", 
+                    Name = "Settings", 
+                    Description = "Personalize", 
+                    Background = "#FF647687",
+                    TileSize = TileSize.Small
+                });
+            }
         }
 
         private async Task InstallAsync()
@@ -51,6 +150,7 @@ namespace eStarter.ViewModels
             {
                 await _manager.InstallAsync(candidate);
                 Refresh();
+                await SaveSettingsAsync();
             }
         }
 
@@ -81,6 +181,46 @@ namespace eStarter.ViewModels
             {
                 // swallow for MVP -- real app should log or surface error
             }
+        }
+
+        private async Task ChangeTileSizeAsync(AppEntry? app)
+        {
+            if (app == null) return;
+
+            // Cycle through tile sizes
+            app.TileSize = app.TileSize switch
+            {
+                TileSize.Small => TileSize.Medium,
+                TileSize.Medium => TileSize.Wide,
+                TileSize.Wide => TileSize.Large,
+                TileSize.Large => TileSize.Small,
+                _ => TileSize.Medium
+            };
+
+            await SaveSettingsAsync();
+        }
+
+        private async Task ChangeTileColorAsync(AppEntry? app)
+        {
+            if (app == null) return;
+
+            // Cycle through Windows accent colors
+            var colors = new[] 
+            { 
+                "#FF0078D7", "#FF1BA1E2", "#FFD24726", "#FFF09609", 
+                "#FF00A1F1", "#FF7E3878", "#FF00ABA9", "#FF647687",
+                "#FFE51400", "#FFE3008C", "#FF00B294", "#FF8CBF26"
+            };
+
+            var currentIndex = System.Array.IndexOf(colors, app.Background);
+            app.Background = colors[(currentIndex + 1) % colors.Length];
+
+            await SaveSettingsAsync();
+        }
+
+        private async Task SaveSettingsAsync()
+        {
+            await _settingsService.SaveTileConfigurationAsync(InstalledApps);
         }
     }
 }

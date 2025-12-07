@@ -39,7 +39,10 @@ namespace eStarter.Core
             if (!Directory.Exists(AppsDirectory))
                 return Enumerable.Empty<string>();
 
-            return Directory.EnumerateDirectories(AppsDirectory).Select(Path.GetFileName);
+            return Directory.EnumerateDirectories(AppsDirectory)
+                .Select(Path.GetFileName)
+                .Where(name => !string.IsNullOrEmpty(name))
+                .Cast<string>();
         }
     }
 }
