@@ -34,7 +34,8 @@ namespace eStarter.ViewModels
             ChangeTileSizeCommand = new RelayCommand(async param => await ChangeTileSizeAsync(param as AppEntry));
             ChangeTileColorCommand = new RelayCommand(async param => await ChangeTileColorAsync(param as AppEntry));
 
-            _ = InitializeAsync();
+            // Initialize async but handle exceptions properly
+            Task.Run(async () => await InitializeAsync());
         }
 
         private async Task InitializeAsync()

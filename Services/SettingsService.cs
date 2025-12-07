@@ -29,9 +29,10 @@ namespace eStarter.Services
                 });
                 await File.WriteAllTextAsync(_settingsPath, json);
             }
-            catch
+            catch (Exception ex)
             {
-                // Fail silently for now - in production, should log this
+                // Log error - in production, use proper logging framework
+                System.Diagnostics.Debug.WriteLine($"Failed to save tile configuration: {ex.GetType().Name} - {ex.Message}");
             }
         }
 
@@ -46,9 +47,10 @@ namespace eStarter.Services
                 var apps = JsonSerializer.Deserialize<List<AppEntry>>(json);
                 return apps ?? new List<AppEntry>();
             }
-            catch
+            catch (Exception ex)
             {
-                // Fail silently and return empty list
+                // Log error and return empty list - in production, use proper logging framework
+                System.Diagnostics.Debug.WriteLine($"Failed to load tile configuration: {ex.GetType().Name} - {ex.Message}");
                 return new List<AppEntry>();
             }
         }
