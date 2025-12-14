@@ -8,369 +8,174 @@
         xmlns:conv="clr-namespace:eStarter.Converters"
         mc:Ignorable="d"
         Title="eStarter" Height="700" Width="1200"
-        Background="#FF1F1F1F"
+        Background="{DynamicResource MetroBackgroundBrush}"
         FontFamily="Segoe UI">
-    <Window.Resources>
-        <conv:BadgeVisibilityConverter x:Key="BadgeVisibilityConverter" />
-        <conv:TileSizeToWidthConverter x:Key="TileSizeToWidthConverter" />
-        <conv:TileSizeToHeightConverter x:Key="TileSizeToHeightConverter" />
-        <conv:TileSizeToFontSizeConverter x:Key="TileSizeToFontSizeConverter" />
-        <conv:TileSizeToVisibilityConverter x:Key="TileSizeToVisibilityConverter" />
-
-        <!-- Metro Style Tile Button (Flat, Sharp Corners, Bold) -->
-        <Style x:Key="MetroTileStyle" TargetType="Button">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Margin" Value="6" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="Width" Value="{Binding TileSize, Converter={StaticResource TileSizeToWidthConverter}}" />
-            <Setter Property="Height" Value="{Binding TileSize, Converter={StaticResource TileSizeToHeightConverter}}" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Grid x:Name="RootGrid" RenderTransformOrigin="0.5,0.5" ClipToBounds="False">
-                            <Grid.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform x:Name="ScaleTransform" ScaleX="1" ScaleY="1" />
-                                </TransformGroup>
-                            </Grid.RenderTransform>
-                            
-                            <!-- Main Tile Background - Pure Metro: Flat, Sharp Corners -->
-                            <Border x:Name="TileBorder" 
-                                    Background="{Binding Background}"
-                                    BorderThickness="0">
-                            </Border>
-
-                            <!-- Metro Hover Overlay - White overlay on hover -->
-                            <Border x:Name="HoverOverlay" 
-                                    Background="White" 
-                                    Opacity="0"/>
-
-                            <!-- Metro Press Overlay - Black overlay on press -->
-                            <Border x:Name="PressOverlay" 
-                                    Background="Black" 
-                                    Opacity="0"/>
-
-                            <!-- Content Grid -->
-                            <Grid Margin="15">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-
-                                <!-- Icon Area (if available) -->
-                                <Viewbox Grid.Row="0" 
-                                        Stretch="Uniform"
-                                        HorizontalAlignment="Center"
-                                        VerticalAlignment="Center"
-                                        Visibility="Collapsed">
-                                    <!-- Icon would go here -->
-                                </Viewbox>
-
-                                <!-- Text Content - Metro Typography -->
-                                <StackPanel Grid.Row="1" 
-                                           VerticalAlignment="Bottom"
-                                           Visibility="{Binding TileSize, Converter={StaticResource TileSizeToVisibilityConverter}, ConverterParameter=small}">
-                                    <!-- Metro style: Light font weight for title -->
-                                    <TextBlock Text="{Binding Name}" 
-                                              FontWeight="Light" 
-                                              FontSize="{Binding TileSize, Converter={StaticResource TileSizeToFontSizeConverter}}"
-                                              Foreground="White" 
-                                              TextWrapping="Wrap"
-                                              TextTrimming="CharacterEllipsis"
-                                              LineHeight="20"
-                                              LineStackingStrategy="BlockLineHeight"/>
-                                    
-                                    <!-- Description with Semilight weight -->
-                                    <TextBlock Text="{Binding Description}" 
-                                              FontWeight="SemiLight"
-                                              FontSize="11"
-                                              Foreground="#CCFFFFFF" 
-                                              TextWrapping="Wrap"
-                                              Margin="0,4,0,0"
-                                              TextTrimming="CharacterEllipsis"
-                                              Visibility="{Binding TileSize, Converter={StaticResource TileSizeToVisibilityConverter}, ConverterParameter=description}"/>
-                                </StackPanel>
-                            </Grid>
-
-                            <!-- Metro Badge - Sharp corners, bold -->
-                            <Border x:Name="Badge" 
-                                    Background="#FFCC0000" 
-                                    MinWidth="24" 
-                                    Height="24" 
-                                    Padding="6,0"
-                                    HorizontalAlignment="Right" 
-                                    VerticalAlignment="Top" 
-                                    Margin="0,6,6,0"
-                                    Visibility="{Binding BadgeCount, Converter={StaticResource BadgeVisibilityConverter}}">
-                                <TextBlock Text="{Binding BadgeCount}" 
-                                          Foreground="White" 
-                                          FontSize="12"
-                                          FontWeight="SemiBold"
-                                          HorizontalAlignment="Center" 
-                                          VerticalAlignment="Center"/>
-                            </Border>
-
-                            <!-- Context Menu for Metro Personalization -->
-                            <Grid.ContextMenu>
-                                <ContextMenu Background="#FF2D2D30" BorderBrush="#FF3F3F46">
-                                    <MenuItem Header="Resize" 
-                                             Command="{Binding DataContext.ChangeTileSizeCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                             CommandParameter="{Binding}"
-                                             Foreground="White"
-                                             Background="#FF2D2D30"/>
-                                    <MenuItem Header="Change color" 
-                                             Command="{Binding DataContext.ChangeTileColorCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                             CommandParameter="{Binding}"
-                                             Foreground="White"
-                                             Background="#FF2D2D30"/>
-                                    <Separator Background="#FF3F3F46"/>
-                                    <MenuItem Header="Turn live tile off" 
-                                             IsEnabled="False"
-                                             Foreground="#FF808080"
-                                             Background="#FF2D2D30"/>
-                                    <MenuItem Header="Unpin from Start" 
-                                             IsEnabled="False"
-                                             Foreground="#FF808080"
-                                             Background="#FF2D2D30"/>
-                                </ContextMenu>
-                            </Grid.ContextMenu>
-                        </Grid>
-
-                        <ControlTemplate.Triggers>
-                            <!-- Metro Hover Effect - Subtle white overlay -->
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="HoverOverlay" 
-                                                           Storyboard.TargetProperty="Opacity" 
-                                                           To="0.08" 
-                                                           Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="HoverOverlay" 
-                                                           Storyboard.TargetProperty="Opacity" 
-                                                           To="0" 
-                                                           Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
-
-                            <!-- Metro Press Effect - Scale down + dark overlay -->
-                            <Trigger Property="IsPressed" Value="True">
-                                <Trigger.EnterActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="PressOverlay" 
-                                                           Storyboard.TargetProperty="Opacity" 
-                                                           To="0.15" 
-                                                           Duration="0:0:0"/>
-                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
-                                                           Storyboard.TargetProperty="ScaleX" 
-                                                           To="0.98" 
-                                                           Duration="0:0:0.05"/>
-                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
-                                                           Storyboard.TargetProperty="ScaleY" 
-                                                           To="0.98" 
-                                                           Duration="0:0:0.05"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.EnterActions>
-                                <Trigger.ExitActions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="PressOverlay" 
-                                                           Storyboard.TargetProperty="Opacity" 
-                                                           To="0" 
-                                                           Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
-                                                           Storyboard.TargetProperty="ScaleX" 
-                                                           To="1.0" 
-                                                           Duration="0:0:0.1"/>
-                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
-                                                           Storyboard.TargetProperty="ScaleY" 
-                                                           To="1.0" 
-                                                           Duration="0:0:0.1"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </Trigger.ExitActions>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </Window.Resources>
-
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+        <!-- Start content (original main UI) -->
+        <Grid x:Name="StartContent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-        <!-- Metro Header Bar -->
-        <Border Grid.Row="0" Background="#FF1F1F1F" Padding="30,20">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+            <!-- Metro Header Bar -->
+            <Border Grid.Row="0" Background="{DynamicResource MetroBackgroundBrush}" Padding="30,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                <!-- Metro Typography: Thin/Light title -->
-                <TextBlock Text="Start" 
-                          FontSize="42" 
-                          FontWeight="Light" 
-                          Foreground="White" 
-                          VerticalAlignment="Center"
-                          Grid.Column="0"
-                          Margin="0,0,0,5"/>
+                    <!-- Metro Typography: Thin/Light title -->
+                    <TextBlock Text="Start" Style="{StaticResource MetroHeaderTextStyle}" Grid.Column="0"/>
 
-                <!-- Metro Style Buttons -->
-                <StackPanel Orientation="Horizontal" 
-                           Grid.Column="2" 
-                           HorizontalAlignment="Right"
-                           VerticalAlignment="Center">
-                    <Button Content="refresh" 
-                           Command="{Binding RefreshCommand}" 
-                           Margin="5,0"
-                           Padding="20,10"
-                           Background="Transparent"
-                           Foreground="White"
-                           BorderBrush="White"
-                           BorderThickness="2"
-                           Cursor="Hand"
-                           FontSize="12"
-                           FontWeight="Normal">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border Background="{TemplateBinding Background}"
-                                                   BorderBrush="{TemplateBinding BorderBrush}"
-                                                   BorderThickness="{TemplateBinding BorderThickness}">
-                                                <ContentPresenter HorizontalAlignment="Center" 
-                                                                VerticalAlignment="Center"
-                                                                Margin="{TemplateBinding Padding}"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter Property="Background" Value="#20FFFFFF"/>
-                                                </Trigger>
-                                                <Trigger Property="IsPressed" Value="True">
-                                                    <Setter Property="Background" Value="#40FFFFFF"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    
-                    <Button Content="install sample" 
-                           Command="{Binding InstallCommand}" 
-                           Margin="5,0"
-                           Padding="20,10"
-                           Background="#FF0078D7"
-                           Foreground="White"
-                           BorderThickness="0"
-                           Cursor="Hand"
-                           FontSize="12"
-                           FontWeight="Normal">
-                        <Button.Style>
-                            <Style TargetType="Button">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border x:Name="border" Background="{TemplateBinding Background}">
-                                                <ContentPresenter HorizontalAlignment="Center" 
-                                                                VerticalAlignment="Center"
-                                                                Margin="{TemplateBinding Padding}"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="border" Property="Background" Value="#FF005A9E"/>
-                                                </Trigger>
-                                                <Trigger Property="IsPressed" Value="True">
-                                                    <Setter TargetName="border" Property="Background" Value="#FF004275"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </StackPanel>
-            </Grid>
-        </Border>
+                    <!-- Metro Style Buttons -->
+                    <StackPanel Orientation="Horizontal" 
+                               Grid.Column="2" 
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center">
+                        <Button Content="refresh" 
+                               Command="{Binding RefreshCommand}" 
+                               Margin="5,0"
+                               Padding="20,10"
+                               Background="Transparent"
+                               Foreground="{DynamicResource MetroForegroundBrush}"
+                               BorderBrush="{DynamicResource MetroForegroundBrush}"
+                               BorderThickness="2"
+                               Cursor="Hand"
+                               FontSize="12"
+                               FontWeight="Normal">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                           BorderBrush="{TemplateBinding BorderBrush}"
+                                           BorderThickness="{TemplateBinding BorderThickness}">
+                                        <ContentPresenter HorizontalAlignment="Center" 
+                                                        VerticalAlignment="Center"
+                                                        Margin="{TemplateBinding Padding}"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MetroSeparatorBrush}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MetroAccentBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
 
-        <!-- Metro Tiles Area -->
-        <ScrollViewer Grid.Row="1" 
-                     HorizontalScrollBarVisibility="Disabled" 
-                     VerticalScrollBarVisibility="Auto"
-                     Background="#FF000000"
-                     Padding="30,20,30,30">
-            <ItemsControl ItemsSource="{Binding InstalledApps}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal"/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                        <Button Content="install sample" 
+                               Command="{Binding InstallCommand}" 
+                               Margin="5,0"
+                               Padding="20,10"
+                               Background="{DynamicResource MetroAccentBrush}"
+                               Foreground="White"
+                               BorderThickness="0"
+                               Cursor="Hand"
+                               FontSize="12"
+                               FontWeight="Normal">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="border" Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" 
+                                                        VerticalAlignment="Center"
+                                                        Margin="{TemplateBinding Padding}"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="border" Property="Opacity" Value="0.6"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type models:AppEntry}">
-                        <!-- Metro Entrance Animation: Slide from right -->
-                        <ContentControl>
-                            <ContentControl.RenderTransform>
-                                <TranslateTransform x:Name="SlideTransform" X="0"/>
-                            </ContentControl.RenderTransform>
-                            <ContentControl.Style>
-                                <Style TargetType="ContentControl">
-                                    <Setter Property="Opacity" Value="0"/>
-                                    <Style.Triggers>
-                                        <EventTrigger RoutedEvent="Loaded">
-                                            <BeginStoryboard>
-                                                <Storyboard>
-                                                    <!-- Metro slide-in from right -->
-                                                    <DoubleAnimation Storyboard.TargetProperty="Opacity" 
-                                                                   From="0" To="1" 
-                                                                   Duration="0:0:0.3"
-                                                                   BeginTime="0:0:0.02">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <ExponentialEase EasingMode="EaseOut"/>
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                    <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
-                                                                   From="60" To="0" 
-                                                                   Duration="0:0:0.3"
-                                                                   BeginTime="0:0:0.02">
-                                                        <DoubleAnimation.EasingFunction>
-                                                            <ExponentialEase EasingMode="EaseOut"/>
-                                                        </DoubleAnimation.EasingFunction>
-                                                    </DoubleAnimation>
-                                                </Storyboard>
-                                            </BeginStoryboard>
-                                        </EventTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </ContentControl.Style>
-                            
-                            <Button Style="{StaticResource MetroTileStyle}" 
-                                   Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                   CommandParameter="{Binding}"/>
-                        </ContentControl>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+            <!-- Metro Tiles Area -->
+            <ScrollViewer Grid.Row="1" 
+                         HorizontalScrollBarVisibility="Disabled" 
+                         VerticalScrollBarVisibility="Auto"
+                         Background="{DynamicResource MetroBackgroundBrush}"
+                         Padding="30,20,30,30">
+                <ItemsControl ItemsSource="{Binding InstalledApps}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type models:AppEntry}">
+                            <ContentControl>
+                                <ContentControl.RenderTransform>
+                                    <TranslateTransform X="0"/>
+                                </ContentControl.RenderTransform>
+                                <ContentControl.Style>
+                                    <Style TargetType="ContentControl">
+                                        <Setter Property="Opacity" Value="0"/>
+                                        <Style.Triggers>
+                                            <EventTrigger RoutedEvent="Loaded">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
+                                                                       From="0" To="1" 
+                                                                       Duration="0:0:0.3"
+                                                                       BeginTime="0:0:0.02">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <ExponentialEase EasingMode="EaseOut"/>
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
+                                                                       From="60" To="0" 
+                                                                       Duration="0:0:0.3"
+                                                                       BeginTime="0:0:0.02">
+                                                            <DoubleAnimation.EasingFunction>
+                                                                <ExponentialEase EasingMode="EaseOut"/>
+                                                            </DoubleAnimation.EasingFunction>
+                                                        </DoubleAnimation>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContentControl.Style>
+                                
+                                <Button Style="{StaticResource MetroTileStyle}" 
+                                       Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                       CommandParameter="{Binding}"/>
+                            </ContentControl>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Page host overlays the start content when a page is active -->
+        <Grid x:Name="PageHostContainer" Visibility="Collapsed" Background="{DynamicResource MetroBackgroundBrush}">
+            <Grid.RenderTransform>
+                <TranslateTransform x:Name="PageHostTransform" X="0"/>
+            </Grid.RenderTransform>
+            
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <ContentControl x:Name="PageHost" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,0,0"/>
+
+            <!-- Global Back button (top-left) -->
+            <Button x:Name="BackButton" Content="&#xE0A6;" 
+                    Style="{StaticResource MetroBackButtonStyle}"
+                    VerticalAlignment="Top" HorizontalAlignment="Left" Margin="30,30,0,0"
+                    Click="BackButton_Click"/>
+        </Grid>
     </Grid>
 </Window>

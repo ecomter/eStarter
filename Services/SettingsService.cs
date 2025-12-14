@@ -10,6 +10,7 @@ namespace eStarter.Services
     public class SettingsService : ISettingsService
     {
         private readonly string _settingsPath;
+        private readonly string _appSettingsPath;
 
         public SettingsService()
         {
@@ -17,6 +18,7 @@ namespace eStarter.Services
             var estarterPath = Path.Combine(appDataPath, "eStarter");
             Directory.CreateDirectory(estarterPath);
             _settingsPath = Path.Combine(estarterPath, "tiles.json");
+            _appSettingsPath = Path.Combine(estarterPath, "settings.json");
         }
 
         public async Task SaveTileConfigurationAsync(IEnumerable<AppEntry> apps)
@@ -52,6 +54,40 @@ namespace eStarter.Services
                 // Log error and return empty list - in production, use proper logging framework
                 System.Diagnostics.Debug.WriteLine($"Failed to load tile configuration: {ex.GetType().Name} - {ex.Message}");
                 return new List<AppEntry>();
+            }
+        }
+
+        public async Task SaveAppSettingsAsync(AppSettings settings)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions 
+                { 
+                    WriteIndented = true 
+                });
+                await File.WriteAllTextAsync(_appSettingsPath, json);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to save app settings: {ex.GetType().Name} - {ex.Message}");
+            }
+        }
+
+        public async Task<AppSettings> LoadAppSettingsAsync()
+        {
+            try
+            {
+                if (!File.Exists(_appSettingsPath))
+                    return new AppSettings();
+
+                var json = await File.ReadAllTextAsync(_appSettingsPath);
+                var settings = JsonSerializer.Deserialize<AppSettings>(json);
+                return settings ?? new AppSettings();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to load app settings: {ex.GetType().Name} - {ex.Message}");
+                return new AppSettings();
             }
         }
     }

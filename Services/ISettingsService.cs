@@ -1,4 +1,6 @@
 using eStarter.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace eStarter.Services
 {
@@ -6,5 +8,8 @@ namespace eStarter.Services
     {
         Task SaveTileConfigurationAsync(IEnumerable<AppEntry> apps);
         Task<IEnumerable<AppEntry>> LoadTileConfigurationAsync();
+
+        Task SaveAppSettingsAsync(AppSettings settings);
+        Task<AppSettings> LoadAppSettingsAsync();
     }
 }

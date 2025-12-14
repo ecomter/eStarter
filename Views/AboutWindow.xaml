@@ -1,0 +1,37 @@
+<Window x:Class="eStarter.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="关于 eStarter" Height="320" Width="520" WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{DynamicResource MetroBackgroundBrush}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="eStarter" FontFamily="Segoe UI Light" FontSize="24" FontWeight="Light" VerticalAlignment="Center" Foreground="{DynamicResource MetroForegroundBrush}"/>
+            <TextBlock Text="  v" FontFamily="Segoe UI Light" FontSize="14" VerticalAlignment="Bottom" Foreground="{DynamicResource MetroForegroundBrush}"/>
+            <TextBlock x:Name="VersionText" FontFamily="Segoe UI Light" FontSize="14" VerticalAlignment="Bottom" Foreground="{DynamicResource MetroForegroundBrush}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <TextBlock TextWrapping="Wrap" FontSize="13" Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.8">
+                eStarter 是一款轻量级的启动器与应用管理器，旨在让常用应用与任务在桌面环境中更快捷地访问与管理。主要功能包括：
+
+                • 快速启动：通过可自定义的瓷砖与快捷方式，一键启动常用程序。
+                • 个性化布局：支持调整瓷砖大小、颜色与排列，满足不同桌面风格。
+                • 简洁的安装体验：集成示例应用安装器，便于演示与上手。
+                • 资源占用低：采用轻量化架构，兼顾速度与响应性。
+
+                本软件适合需要将常用工具快速集成到统一入口的用户与开发者。欢迎反馈与贡献。
+            </TextBlock>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Width="90" Margin="6,0" Click="OpenLicense" Background="{DynamicResource MetroAccentBrush}" Foreground="White" BorderThickness="0">查看许可</Button>
+            <Button Width="90" Margin="6,0" Click="Close_Click" Background="{DynamicResource MetroSeparatorBrush}" Foreground="{DynamicResource MetroForegroundBrush}" BorderThickness="0">关闭</Button>
+        </StackPanel>
+    </Grid>
+</Window>

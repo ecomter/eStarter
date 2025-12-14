@@ -1,0 +1,23 @@
+<Window x:Class="eStarter.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Settings" Height="400" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="{DynamicResource MetroBackgroundBrush}">
+    <Grid Margin="20">
+        <StackPanel>
+            <TextBlock Text="Settings" FontFamily="Segoe UI Light" FontSize="24" FontWeight="Light" Margin="0,0,0,10" Foreground="{DynamicResource MetroForegroundBrush}"/>
+            <StackPanel Orientation="Vertical" Margin="0,10">
+                <TextBlock Text="Theme" FontFamily="Segoe UI Light" FontWeight="SemiBold" Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <ComboBox x:Name="ThemeCombo" Width="200" Margin="0,6" Style="{StaticResource MetroComboBoxStyle}">
+                    <ComboBoxItem Content="Light"/>
+                    <ComboBoxItem Content="Dark"/>
+                </ComboBox>
+
+                <TextBlock Text="Tile Animation" FontFamily="Segoe UI Light" FontWeight="SemiBold" Margin="0,8,0,0" Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <CheckBox x:Name="EnableAnimation" Content="Enable Win8-style animations" IsChecked="True" Foreground="{DynamicResource MetroForegroundBrush}"/>
+
+                <Button Content="Reset App Data" Width="160" Margin="0,12,0,0" Click="ResetAppData_Click" Background="{DynamicResource MetroAccentBrush}" Foreground="White" BorderThickness="0"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

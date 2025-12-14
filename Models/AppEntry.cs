@@ -23,6 +23,16 @@ namespace eStarter.Models
         private bool _showName = true;
         private bool _showDescription = true;
 
+        // New properties for built-in software support
+        private string _publisher = string.Empty;
+        private string _version = "1.0.0";
+        private System.DateTime _installDate = System.DateTime.Now;
+        private long _size; // in bytes
+        private string? _exePath;
+        private string? _arguments;
+        private string _category = "General";
+        private string _status = "Ready";
+
         public string Id
         {
             get => _id;
@@ -75,6 +85,55 @@ namespace eStarter.Models
         {
             get => _showDescription;
             set { _showDescription = value; OnPropertyChanged(); }
+        }
+
+        // Extended Properties
+        public string Publisher
+        {
+            get => _publisher;
+            set { _publisher = value; OnPropertyChanged(); }
+        }
+
+        public string Version
+        {
+            get => _version;
+            set { _version = value; OnPropertyChanged(); }
+        }
+
+        public System.DateTime InstallDate
+        {
+            get => _installDate;
+            set { _installDate = value; OnPropertyChanged(); }
+        }
+
+        public long Size
+        {
+            get => _size;
+            set { _size = value; OnPropertyChanged(); }
+        }
+
+        public string? ExePath
+        {
+            get => _exePath;
+            set { _exePath = value; OnPropertyChanged(); }
+        }
+
+        public string? Arguments
+        {
+            get => _arguments;
+            set { _arguments = value; OnPropertyChanged(); }
+        }
+
+        public string Category
+        {
+            get => _category;
+            set { _category = value; OnPropertyChanged(); }
+        }
+
+        public string Status
+        {
+            get => _status;
+            set { _status = value; OnPropertyChanged(); }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

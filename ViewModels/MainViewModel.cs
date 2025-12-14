@@ -1,16 +1,21 @@
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using eStarter.Core;
 using eStarter.Models;
 using eStarter.Services;
+using eStarter.Views;
 
 namespace eStarter.ViewModels
 {
-    public class MainViewModel
+    public class MainViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<AppEntry> InstalledApps { get; } = new ObservableCollection<AppEntry>();
         public ICommand RefreshCommand { get; }
@@ -18,9 +23,25 @@ namespace eStarter.ViewModels
         public ICommand LaunchCommand { get; }
         public ICommand ChangeTileSizeCommand { get; }
         public ICommand ChangeTileColorCommand { get; }
+        public ICommand ChangeThemeCommand { get; }
+        public ICommand ChangeAccentColorCommand { get; }
 
         private readonly AppManager _manager;
         private readonly ISettingsService _settingsService;
+        private AppSettings _currentSettings = new AppSettings();
+
+        public AppSettings CurrentSettings
+        {
+            get => _currentSettings;
+            set { _currentSettings = value; OnPropertyChanged(); }
+        }
+
+        public ObservableCollection<string> AvailableAccentColors { get; } = new ObservableCollection<string>
+        {
+            "#FF0078D7", "#FF1BA1E2", "#FFD24726", "#FFF09609", 
+            "#FF00A1F1", "#FF7E3878", "#FF00ABA9", "#FF647687",
+            "#FFE51400", "#FFE3008C", "#FF00B294", "#FF8CBF26"
+        };
 
         public MainViewModel()
         {
@@ -30,9 +51,11 @@ namespace eStarter.ViewModels
 
             RefreshCommand = new RelayCommand(_ => Refresh());
             InstallCommand = new RelayCommand(async _ => await InstallAsync());
-            LaunchCommand = new RelayCommand(param => LaunchApp((param as AppEntry)?.Id));
+            LaunchCommand = new RelayCommand(param => LaunchApp(param as AppEntry));
             ChangeTileSizeCommand = new RelayCommand(async param => await ChangeTileSizeAsync(param as AppEntry));
             ChangeTileColorCommand = new RelayCommand(async param => await ChangeTileColorAsync(param as AppEntry));
+            ChangeThemeCommand = new RelayCommand(async param => await ChangeThemeAsync(param as string));
+            ChangeAccentColorCommand = new RelayCommand(async param => await ChangeAccentColorSettingAsync(param as string));
 
             // Initialize async but handle exceptions properly
             Task.Run(async () => await InitializeAsync());
@@ -40,27 +63,82 @@ namespace eStarter.ViewModels
 
         private async Task InitializeAsync()
         {
+            // Load App Settings
+            CurrentSettings = await _settingsService.LoadAppSettingsAsync();
+            Application.Current.Dispatcher.Invoke(() => ApplyTheme(CurrentSettings));
+
             // Try to load saved configuration first
             var savedApps = await _settingsService.LoadTileConfigurationAsync();
             var savedList = savedApps.ToList();
             
-            if (savedList.Any())
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                foreach (var app in savedList)
-                    InstalledApps.Add(app);
+                if (savedList.Any())
+                {
+                    foreach (var app in savedList)
+                        InstalledApps.Add(app);
+                }
+                else
+                {
+                    // No saved config, load defaults
+                    Refresh();
+                }
+            });
+        }
+
+        private async Task ChangeThemeAsync(string? theme)
+        {
+            if (string.IsNullOrEmpty(theme)) return;
+            CurrentSettings.Theme = theme;
+            ApplyTheme(CurrentSettings);
+            await _settingsService.SaveAppSettingsAsync(CurrentSettings);
+        }
+
+        private async Task ChangeAccentColorSettingAsync(string? color)
+        {
+            if (string.IsNullOrEmpty(color)) return;
+            CurrentSettings.AccentColor = color;
+            ApplyTheme(CurrentSettings);
+            await _settingsService.SaveAppSettingsAsync(CurrentSettings);
+        }
+
+        private void ApplyTheme(AppSettings settings)
+        {
+            try
+            {
+                // Apply Accent Color
+                if (ColorConverter.ConvertFromString(settings.AccentColor) is Color accentColor)
+                {
+                    Application.Current.Resources["MetroAccentColor"] = accentColor;
+                    Application.Current.Resources["MetroAccentBrush"] = new SolidColorBrush(accentColor);
+                }
+
+                // Apply Theme (Dark/Light)
+                if (settings.Theme == "Light")
+                {
+                    Application.Current.Resources["MetroBackgroundBrush"] = new SolidColorBrush(Colors.White);
+                    Application.Current.Resources["MetroForegroundBrush"] = new SolidColorBrush(Colors.Black);
+                    Application.Current.Resources["MetroSeparatorBrush"] = new SolidColorBrush(Color.FromArgb(51, 0, 0, 0)); // #33000000
+                }
+                else
+                {
+                    Application.Current.Resources["MetroBackgroundBrush"] = new SolidColorBrush(Color.FromRgb(31, 31, 31)); // #FF1F1F1F
+                    Application.Current.Resources["MetroForegroundBrush"] = new SolidColorBrush(Colors.White);
+                    Application.Current.Resources["MetroSeparatorBrush"] = new SolidColorBrush(Color.FromArgb(51, 255, 255, 255)); // #33FFFFFF
+                }
             }
-            else
+            catch
             {
-                // No saved config, load defaults
-                Refresh();
+                // Ignore invalid colors
             }
         }
 
         private void Refresh()
         {
             InstalledApps.Clear();
-            foreach (var app in _manager.GetInstalledApps())
-                InstalledApps.Add(new AppEntry { Id = app, Name = app });
+            // Load installed apps from manifest or directory scan
+            foreach (var app in _manager.GetInstalledAppEntries())
+                InstalledApps.Add(app);
 
             // Add demo tiles if empty with varied sizes and colors (Metro style)
             if (!InstalledApps.Any())
@@ -72,7 +150,10 @@ namespace eStarter.ViewModels
                     Description = "Your messages", 
                     BadgeCount = 5, 
                     Background = "#FF0078D7",
-                    TileSize = TileSize.Medium
+                    TileSize = TileSize.Medium,
+                    Publisher = "Microsoft Corporation",
+                    Category = "Productivity",
+                    Version = "1.2.0"
                 });
                 
                 InstalledApps.Add(new AppEntry 
@@ -81,7 +162,9 @@ namespace eStarter.ViewModels
                     Name = "Calendar", 
                     Description = "Stay organized", 
                     Background = "#FF1BA1E2",
-                    TileSize = TileSize.Medium
+                    TileSize = TileSize.Medium,
+                    Publisher = "Microsoft Corporation",
+                    Category = "Productivity"
                 });
                 
                 InstalledApps.Add(new AppEntry 
@@ -90,7 +173,9 @@ namespace eStarter.ViewModels
                     Name = "Photos", 
                     Description = "Your memories", 
                     Background = "#FFD24726",
-                    TileSize = TileSize.Wide
+                    TileSize = TileSize.Wide,
+                    Publisher = "Microsoft Corporation",
+                    Category = "Photo & Video"
                 });
                 
                 InstalledApps.Add(new AppEntry 
@@ -99,7 +184,9 @@ namespace eStarter.ViewModels
                     Name = "Music", 
                     Description = "Groove to your favorites", 
                     Background = "#FFF09609",
-                    TileSize = TileSize.Medium
+                    TileSize = TileSize.Medium,
+                    Publisher = "Microsoft Corporation",
+                    Category = "Music"
                 });
                 
                 InstalledApps.Add(new AppEntry 
@@ -108,7 +195,9 @@ namespace eStarter.ViewModels
                     Name = "Store", 
                     Description = "Get apps", 
                     Background = "#FF00A1F1",
-                    TileSize = TileSize.Medium
+                    TileSize = TileSize.Medium,
+                    Publisher = "Microsoft Corporation",
+                    Category = "Shopping"
                 });
                 
                 InstalledApps.Add(new AppEntry 
@@ -118,7 +207,9 @@ namespace eStarter.ViewModels
                     Description = "Stay informed", 
                     BadgeCount = 12,
                     Background = "#FF7E3878",
-                    TileSize = TileSize.Wide
+                    TileSize = TileSize.Wide,
+                    Publisher = "Microsoft Corporation",
+                    Category = "News & Weather"
                 });
                 
                 InstalledApps.Add(new AppEntry 
@@ -127,16 +218,49 @@ namespace eStarter.ViewModels
                     Name = "Weather", 
                     Description = "72° Sunny", 
                     Background = "#FF00ABA9",
-                    TileSize = TileSize.Medium
+                    TileSize = TileSize.Medium,
+                    Publisher = "Microsoft Corporation",
+                    Category = "News & Weather"
                 });
-                
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.settings", 
-                    Name = "Settings", 
-                    Description = "Personalize", 
+
+                InstalledApps.Add(new AppEntry
+                {
+                    Id = "demo.settings",
+                    Name = "Settings",
+                    Description = "Personalize",
                     Background = "#FF647687",
-                    TileSize = TileSize.Small
+                    TileSize = TileSize.Medium,
+                    Publisher = "System",
+                    Category = "System"
+                });
+            }
+
+            // Ensure About and Settings tiles exist so user can always access them
+            if (!InstalledApps.Any(x => x.Id == "demo.about"))
+            {
+                InstalledApps.Add(new AppEntry
+                {
+                    Id = "demo.about",
+                    Name = "About",
+                    Description = "About this app",
+                    Background = "#FF2D2D30",
+                    TileSize = TileSize.Medium,
+                    Publisher = "System",
+                    Category = "System"
+                });
+            }
+
+            if (!InstalledApps.Any(x => x.Id == "demo.settings"))
+            {
+                InstalledApps.Add(new AppEntry
+                {
+                    Id = "demo.settings",
+                    Name = "Settings",
+                    Description = "Personalize the app",
+                    Background = "#FF647687",
+                    TileSize = TileSize.Medium,
+                    Publisher = "System",
+                    Category = "System"
                 });
             }
         }
@@ -149,32 +273,70 @@ namespace eStarter.ViewModels
             if (File.Exists(candidate))
             {
                 await _manager.InstallAsync(candidate);
-                Refresh();
+                Application.Current.Dispatcher.Invoke(() => Refresh());
                 await SaveSettingsAsync();
             }
         }
 
-        private void LaunchApp(string? appId)
+        private void LaunchApp(AppEntry? app)
         {
-            if (string.IsNullOrWhiteSpace(appId))
+            if (app == null || string.IsNullOrWhiteSpace(app.Id))
                 return;
 
-            var baseDir = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "eStarter", "apps", appId);
+            // If it's the About tile, navigate to AboutPage inside main window
+            if (app.Id == "demo.about")
+            {
+                Application.Current?.Dispatcher?.Invoke(() =>
+                {
+                    var mw = Application.Current?.MainWindow as MainWindow;
+                    mw?.ShowPage(new Views.AboutPage());
+                });
+                return;
+            }
+
+            // If it's the Settings tile, navigate to SettingsPage inside main window
+            if (app.Id == "demo.settings" || app.Id == "system.settings")
+            {
+                Application.Current?.Dispatcher?.Invoke(() =>
+                {
+                    var mw = Application.Current?.MainWindow as MainWindow;
+                    mw?.ShowPage(new Views.SettingsPage());
+                });
+                return;
+            }
+
+            var baseDir = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "eStarter", "apps", app.Id);
             if (!Directory.Exists(baseDir))
                 return;
 
-            // Find an executable in the app folder (top-level)
-            var exe = Directory.EnumerateFiles(baseDir, "*.exe", SearchOption.TopDirectoryOnly).FirstOrDefault();
-            if (exe == null)
+            // Use explicit ExePath from manifest if available, otherwise search
+            string? exePath = null;
+            if (!string.IsNullOrEmpty(app.ExePath))
+            {
+                exePath = Path.Combine(baseDir, app.ExePath);
+            }
+            
+            if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
+            {
+                exePath = Directory.EnumerateFiles(baseDir, "*.exe", SearchOption.TopDirectoryOnly).FirstOrDefault();
+            }
+
+            if (exePath == null)
                 return;
 
             try
             {
-                var psi = new ProcessStartInfo(exe)
+                var psi = new ProcessStartInfo(exePath)
                 {
-                    WorkingDirectory = Path.GetDirectoryName(exe) ?? baseDir,
+                    WorkingDirectory = Path.GetDirectoryName(exePath) ?? baseDir,
                     UseShellExecute = true
                 };
+
+                if (!string.IsNullOrEmpty(app.Arguments))
+                {
+                    psi.Arguments = app.Arguments;
+                }
+
                 Process.Start(psi);
             }
             catch
@@ -221,6 +383,13 @@ namespace eStarter.ViewModels
         private async Task SaveSettingsAsync()
         {
             await _settingsService.SaveTileConfigurationAsync(InstalledApps);
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

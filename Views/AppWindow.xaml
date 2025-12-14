@@ -1,0 +1,38 @@
+<Window x:Class="eStarter.Views.AppWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="App" Height="700" Width="1200" WindowStartupLocation="CenterOwner">
+    <Grid Background="#FF1F1F1F">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Border Background="#FF1F1F1F" Padding="20">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="App" FontSize="28" FontWeight="Light" Foreground="White"/>
+                <TextBlock Text=" - " FontSize="28" Foreground="White"/>
+                <TextBlock x:Name="AppName" FontSize="28" FontWeight="Bold" Foreground="White"/>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left navigation tiles similar to main UI -->
+            <StackPanel Grid.Column="0" Orientation="Vertical" Background="#FF2D2D30"  Margin="0,0,20,0">
+                <Button Content="Start" Margin="0,6" Padding="10"/>
+                <Button Content="Settings" Margin="0,6" Padding="10"/>
+                <Button Content="About" Margin="0,6" Padding="10"/>
+            </StackPanel>
+
+            <!-- Main content area that mimics metro tiles -->
+            <ScrollViewer Grid.Column="1" Background="#FF000000">
+                <WrapPanel x:Name="AppTiles" Margin="10"/>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Window>
