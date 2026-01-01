@@ -15,6 +15,11 @@ namespace eStarter.Views
             InitializeComponent();
         }
 
+        private string GetString(string key)
+        {
+            return Application.Current.Resources[key] as string ?? key;
+        }
+
         private void SettingsNav_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SettingsNav.SelectedItem is ListBoxItem selectedItem && selectedItem.Tag is string tag)
@@ -23,6 +28,7 @@ namespace eStarter.Views
                 if (PersonalizationPanel != null) PersonalizationPanel.Visibility = Visibility.Collapsed;
                 if (UpdateRecoveryPanel != null) UpdateRecoveryPanel.Visibility = Visibility.Collapsed;
                 if (AboutPanel != null) AboutPanel.Visibility = Visibility.Collapsed;
+                if (TimeLanguagePanel != null) TimeLanguagePanel.Visibility = Visibility.Collapsed;
                 if (PlaceholderPanel != null) PlaceholderPanel.Visibility = Visibility.Collapsed;
 
                 UIElement? targetPanel = null;
@@ -35,6 +41,9 @@ namespace eStarter.Views
                         break;
                     case "UpdateRecovery":
                         if (UpdateRecoveryPanel != null) targetPanel = UpdateRecoveryPanel;
+                        break;
+                    case "TimeLanguage":
+                        if (TimeLanguagePanel != null) targetPanel = TimeLanguagePanel;
                         break;
                     case "About":
                         if (AboutPanel != null) targetPanel = AboutPanel;
@@ -91,8 +100,8 @@ namespace eStarter.Views
         private void ResetAppData_Click(object sender, RoutedEventArgs e)
         {
             var result = ModernMsgBox.ShowMessage(
-                "Are you sure you want to remove all installed applications and reset settings? This action cannot be undone.",
-                "Reset App Data",
+                GetString("Str_ResetConfirmMsg"),
+                GetString("Str_ResetConfirmTitle"),
                 MessageBoxButton.YesNo,
                 Window.GetWindow(this));
 
@@ -106,7 +115,7 @@ namespace eStarter.Views
                         Directory.Delete(baseDir, true);
                     }
 
-                    ModernMsgBox.ShowMessage("App data has been reset. Please restart the application.", "Reset Complete", MessageBoxButton.OK, Window.GetWindow(this));
+                    ModernMsgBox.ShowMessage(GetString("Str_ResetCompleteMsg"), GetString("Str_ResetCompleteTitle"), MessageBoxButton.OK, Window.GetWindow(this));
                     
                     // Optional: Restart app
                     // System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
@@ -114,7 +123,7 @@ namespace eStarter.Views
                 }
                 catch (System.Exception ex)
                 {
-                    ModernMsgBox.ShowMessage($"Failed to reset app data: {ex.Message}", "Error", MessageBoxButton.OK, Window.GetWindow(this));
+                    ModernMsgBox.ShowMessage(string.Format(GetString("Str_ResetFailed"), ex.Message), GetString("Str_ErrorTitle"), MessageBoxButton.OK, Window.GetWindow(this));
                 }
             }
         }

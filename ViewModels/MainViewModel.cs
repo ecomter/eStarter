@@ -12,12 +12,17 @@ using eStarter.Core;
 using eStarter.Models;
 using eStarter.Services;
 using eStarter.Views;
+using System;
 
 namespace eStarter.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<AppEntry> InstalledApps { get; } = new ObservableCollection<AppEntry>();
+        public ObservableCollection<AppEntry> SearchResults { get; } = new ObservableCollection<AppEntry>();
+        public ObservableCollection<TimeZoneInfo> AvailableTimeZones { get; } = new ObservableCollection<TimeZoneInfo>(TimeZoneInfo.GetSystemTimeZones());
+        public ObservableCollection<string> AvailableLanguages { get; } = new ObservableCollection<string> { "English", "中文" };
+
         public ICommand RefreshCommand { get; }
         public ICommand InstallCommand { get; }
         public ICommand LaunchCommand { get; }
@@ -25,15 +30,131 @@ namespace eStarter.ViewModels
         public ICommand ChangeTileColorCommand { get; }
         public ICommand ChangeThemeCommand { get; }
         public ICommand ChangeAccentColorCommand { get; }
+        public ICommand CloseSearchCommand { get; }
+        public ICommand OpenSearchCommand { get; }
+        public ICommand ToggleTimeCommand { get; }
 
         private readonly AppManager _manager;
         private readonly ISettingsService _settingsService;
         private AppSettings _currentSettings = new AppSettings();
+        private string _searchText = string.Empty;
+        private bool _isSearchOpen;
+        private string _userName = System.Environment.UserName;
+        private string _currentTime = System.DateTime.Now.ToString("t");
+        private System.Windows.Threading.DispatcherTimer _timer;
+
+        private string GetString(string key) => Application.Current.Resources[key] as string ?? key;
 
         public AppSettings CurrentSettings
         {
             get => _currentSettings;
-            set { _currentSettings = value; OnPropertyChanged(); }
+            set 
+            { 
+                _currentSettings = value; 
+                OnPropertyChanged(); 
+                OnPropertyChanged(nameof(ShowTime));
+                OnPropertyChanged(nameof(SelectedTimeZone));
+                OnPropertyChanged(nameof(SelectedLanguage));
+            }
+        }
+
+        public string SelectedLanguage
+        {
+            get => CurrentSettings.Language == "zh-CN" ? "中文" : "English";
+            set
+            {
+                var langCode = value == "中文" ? "zh-CN" : "en-US";
+                if (CurrentSettings.Language != langCode)
+                {
+                    CurrentSettings.Language = langCode;
+                    OnPropertyChanged();
+                    ApplyLanguage(langCode);
+                    _ = _settingsService.SaveAppSettingsAsync(CurrentSettings);
+                }
+            }
+        }
+
+        public TimeZoneInfo SelectedTimeZone
+        {
+            get
+            {
+                try
+                {
+                    return TimeZoneInfo.FindSystemTimeZoneById(CurrentSettings.TimeZoneId);
+                }
+                catch
+                {
+                    return TimeZoneInfo.Local;
+                }
+            }
+            set
+            {
+                if (value != null && CurrentSettings.TimeZoneId != value.Id)
+                {
+                    CurrentSettings.TimeZoneId = value.Id;
+                    OnPropertyChanged();
+                    _ = _settingsService.SaveAppSettingsAsync(CurrentSettings);
+                    UpdateCurrentTime();
+                }
+            }
+        }
+
+        public string UserName
+        {
+            get => _userName;
+            set { _userName = value; OnPropertyChanged(); }
+        }
+
+        public string CurrentTime
+        {
+            get => _currentTime;
+            set { _currentTime = value; OnPropertyChanged(); }
+        }
+
+        public bool ShowTime
+        {
+            get => CurrentSettings.ShowTime;
+            set
+            {
+                if (CurrentSettings.ShowTime != value)
+                {
+                    CurrentSettings.ShowTime = value;
+                    OnPropertyChanged();
+                    _ = _settingsService.SaveAppSettingsAsync(CurrentSettings);
+                }
+            }
+        }
+
+        public string SearchText
+        {
+            get => _searchText;
+            set
+            {
+                if (_searchText != value)
+                {
+                    _searchText = value;
+                    OnPropertyChanged();
+                    PerformSearch();
+                }
+            }
+        }
+
+        public bool IsSearchOpen
+        {
+            get => _isSearchOpen;
+            set
+            {
+                if (_isSearchOpen != value)
+                {
+                    _isSearchOpen = value;
+                    OnPropertyChanged();
+                    if (!value)
+                    {
+                        SearchText = string.Empty;
+                        SearchResults.Clear();
+                    }
+                }
+            }
         }
 
         public ObservableCollection<string> AvailableAccentColors { get; } = new ObservableCollection<string>
@@ -56,16 +177,60 @@ namespace eStarter.ViewModels
             ChangeTileColorCommand = new RelayCommand(async param => await ChangeTileColorAsync(param as AppEntry));
             ChangeThemeCommand = new RelayCommand(async param => await ChangeThemeAsync(param as string));
             ChangeAccentColorCommand = new RelayCommand(async param => await ChangeAccentColorSettingAsync(param as string));
+            CloseSearchCommand = new RelayCommand(_ => IsSearchOpen = false);
+            OpenSearchCommand = new RelayCommand(_ => IsSearchOpen = true);
+            ToggleTimeCommand = new RelayCommand(_ => ShowTime = !ShowTime);
+
+            // Setup Timer
+            _timer = new System.Windows.Threading.DispatcherTimer();
+            _timer.Interval = System.TimeSpan.FromSeconds(1);
+            _timer.Tick += (s, e) => UpdateCurrentTime();
+            _timer.Start();
 
             // Initialize async but handle exceptions properly
             Task.Run(async () => await InitializeAsync());
+        }
+
+        private void UpdateCurrentTime()
+        {
+            try
+            {
+                var tz = TimeZoneInfo.FindSystemTimeZoneById(CurrentSettings.TimeZoneId);
+                var time = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.Local, tz);
+                CurrentTime = time.ToString("t");
+            }
+            catch
+            {
+                CurrentTime = DateTime.Now.ToString("t");
+            }
+        }
+
+        private void PerformSearch()
+        {
+            SearchResults.Clear();
+            if (string.IsNullOrWhiteSpace(SearchText))
+                return;
+
+            var query = SearchText.ToLower();
+            foreach (var app in InstalledApps)
+            {
+                if ((app.Name?.ToLower().Contains(query) == true) || 
+                    (app.Description?.ToLower().Contains(query) == true))
+                {
+                    SearchResults.Add(app);
+                }
+            }
         }
 
         private async Task InitializeAsync()
         {
             // Load App Settings
             CurrentSettings = await _settingsService.LoadAppSettingsAsync();
-            Application.Current.Dispatcher.Invoke(() => ApplyTheme(CurrentSettings));
+            Application.Current.Dispatcher.Invoke(() => 
+            {
+                ApplyTheme(CurrentSettings);
+                ApplyLanguage(CurrentSettings.Language);
+            });
 
             // Try to load saved configuration first
             var savedApps = await _settingsService.LoadTileConfigurationAsync();
@@ -77,6 +242,9 @@ namespace eStarter.ViewModels
                 {
                     foreach (var app in savedList)
                         InstalledApps.Add(app);
+                    
+                    // Update names for demo apps in case they were saved in a different language
+                    UpdateDemoAppNames();
                 }
                 else
                 {
@@ -100,6 +268,65 @@ namespace eStarter.ViewModels
             CurrentSettings.AccentColor = color;
             ApplyTheme(CurrentSettings);
             await _settingsService.SaveAppSettingsAsync(CurrentSettings);
+        }
+
+        private void ApplyLanguage(string language)
+        {
+            var dictName = language == "zh-CN" ? "Strings.zh-CN.xaml" : "Strings.xaml";
+            var uri = new Uri($"pack://application:,,,/Resources/{dictName}", UriKind.Absolute);
+            
+            try
+            {
+                var newDict = new ResourceDictionary { Source = uri };
+                var mergedDicts = Application.Current.Resources.MergedDictionaries;
+                
+                // Find existing string resource dictionary and replace it
+                // We assume it's the second one based on App.xaml structure, but safer to check Source
+                // However, Source property might be null for some dicts.
+                // A better way is to remove any dict that looks like a string resource and add the new one.
+                
+                var existing = mergedDicts.FirstOrDefault(d => d.Source != null && (d.Source.OriginalString.Contains("StringResources") || d.Source.OriginalString.Contains("Strings")));
+                if (existing != null)
+                {
+                    mergedDicts.Remove(existing);
+                }
+                mergedDicts.Add(newDict);
+
+                // Update demo app names to match new language
+                UpdateDemoAppNames();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to load language dictionary: {ex.Message}");
+            }
+        }
+
+        private void UpdateDemoAppNames()
+        {
+            foreach (var app in InstalledApps)
+            {
+                if (app.Id.StartsWith("demo."))
+                {
+                    string nameKey = "";
+                    string descKey = "";
+                    
+                    switch (app.Id)
+                    {
+                        case "demo.mail": nameKey = "Str_DemoMailName"; descKey = "Str_DemoMailDesc"; break;
+                        case "demo.calendar": nameKey = "Str_DemoCalendarName"; descKey = "Str_DemoCalendarDesc"; break;
+                        case "demo.photos": nameKey = "Str_DemoPhotosName"; descKey = "Str_DemoPhotosDesc"; break;
+                        case "demo.music": nameKey = "Str_DemoMusicName"; descKey = "Str_DemoMusicDesc"; break;
+                        case "demo.store": nameKey = "Str_DemoStoreName"; descKey = "Str_DemoStoreDesc"; break;
+                        case "demo.news": nameKey = "Str_DemoNewsName"; descKey = "Str_DemoNewsDesc"; break;
+                        case "demo.weather": nameKey = "Str_DemoWeatherName"; descKey = "Str_DemoWeatherDesc"; break;
+                        case "demo.settings": nameKey = "Str_DemoSettingsName"; descKey = "Str_DemoSettingsDesc"; break;
+                        case "demo.about": nameKey = "Str_DemoAboutName"; descKey = "Str_DemoAboutDesc"; break;
+                    }
+
+                    if (!string.IsNullOrEmpty(nameKey)) app.Name = GetString(nameKey);
+                    if (!string.IsNullOrEmpty(descKey)) app.Description = GetString(descKey);
+                }
+            }
         }
 
         private void ApplyTheme(AppSettings settings)
@@ -146,8 +373,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry 
                 { 
                     Id = "demo.mail", 
-                    Name = "Mail", 
-                    Description = "Your messages", 
+                    Name = GetString("Str_DemoMailName"), 
+                    Description = GetString("Str_DemoMailDesc"), 
                     BadgeCount = 5, 
                     Background = "#FF0078D7",
                     TileSize = TileSize.Medium,
@@ -159,8 +386,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry 
                 { 
                     Id = "demo.calendar", 
-                    Name = "Calendar", 
-                    Description = "Stay organized", 
+                    Name = GetString("Str_DemoCalendarName"), 
+                    Description = GetString("Str_DemoCalendarDesc"), 
                     Background = "#FF1BA1E2",
                     TileSize = TileSize.Medium,
                     Publisher = "Microsoft Corporation",
@@ -170,8 +397,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry 
                 { 
                     Id = "demo.photos", 
-                    Name = "Photos", 
-                    Description = "Your memories", 
+                    Name = GetString("Str_DemoPhotosName"), 
+                    Description = GetString("Str_DemoPhotosDesc"), 
                     Background = "#FFD24726",
                     TileSize = TileSize.Wide,
                     Publisher = "Microsoft Corporation",
@@ -181,8 +408,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry 
                 { 
                     Id = "demo.music", 
-                    Name = "Music", 
-                    Description = "Groove to your favorites", 
+                    Name = GetString("Str_DemoMusicName"), 
+                    Description = GetString("Str_DemoMusicDesc"), 
                     Background = "#FFF09609",
                     TileSize = TileSize.Medium,
                     Publisher = "Microsoft Corporation",
@@ -192,8 +419,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry 
                 { 
                     Id = "demo.store", 
-                    Name = "Store", 
-                    Description = "Get apps", 
+                    Name = GetString("Str_DemoStoreName"), 
+                    Description = GetString("Str_DemoStoreDesc"), 
                     Background = "#FF00A1F1",
                     TileSize = TileSize.Medium,
                     Publisher = "Microsoft Corporation",
@@ -203,8 +430,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry 
                 { 
                     Id = "demo.news", 
-                    Name = "News", 
-                    Description = "Stay informed", 
+                    Name = GetString("Str_DemoNewsName"), 
+                    Description = GetString("Str_DemoNewsDesc"), 
                     BadgeCount = 12,
                     Background = "#FF7E3878",
                     TileSize = TileSize.Wide,
@@ -215,8 +442,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry 
                 { 
                     Id = "demo.weather", 
-                    Name = "Weather", 
-                    Description = "72° Sunny", 
+                    Name = GetString("Str_DemoWeatherName"), 
+                    Description = GetString("Str_DemoWeatherDesc"), 
                     Background = "#FF00ABA9",
                     TileSize = TileSize.Medium,
                     Publisher = "Microsoft Corporation",
@@ -226,8 +453,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry
                 {
                     Id = "demo.settings",
-                    Name = "Settings",
-                    Description = "Personalize",
+                    Name = GetString("Str_DemoSettingsName"),
+                    Description = GetString("Str_DemoSettingsDesc"), 
                     Background = "#FF647687",
                     TileSize = TileSize.Medium,
                     Publisher = "System",
@@ -241,8 +468,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry
                 {
                     Id = "demo.about",
-                    Name = "About",
-                    Description = "About this app",
+                    Name = GetString("Str_DemoAboutName"),
+                    Description = GetString("Str_DemoAboutDesc"), 
                     Background = "#FF2D2D30",
                     TileSize = TileSize.Medium,
                     Publisher = "System",
@@ -255,8 +482,8 @@ namespace eStarter.ViewModels
                 InstalledApps.Add(new AppEntry
                 {
                     Id = "demo.settings",
-                    Name = "Settings",
-                    Description = "Personalize the app",
+                    Name = GetString("Str_DemoSettingsName"),
+                    Description = GetString("Str_DemoSettingsDesc"), 
                     Background = "#FF647687",
                     TileSize = TileSize.Medium,
                     Publisher = "System",
@@ -307,7 +534,21 @@ namespace eStarter.ViewModels
 
             var baseDir = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "eStarter", "apps", app.Id);
             if (!Directory.Exists(baseDir))
+            {
+                // Show feedback for demo apps
+                if (app.Id.StartsWith("demo."))
+                {
+                    Application.Current?.Dispatcher?.Invoke(() =>
+                    {
+                        ModernMsgBox.ShowMessage(
+                            string.Format(GetString("Str_DemoAppMsg"), app.Name), 
+                            GetString("Str_DemoAppTitle"), 
+                            MessageBoxButton.OK, 
+                            Application.Current.MainWindow);
+                    });
+                }
                 return;
+            }
 
             // Use explicit ExePath from manifest if available, otherwise search
             string? exePath = null;
@@ -322,7 +563,17 @@ namespace eStarter.ViewModels
             }
 
             if (exePath == null)
+            {
+                Application.Current?.Dispatcher?.Invoke(() =>
+                {
+                    ModernMsgBox.ShowMessage(
+                        string.Format(GetString("Str_LaunchErrorMsg"), app.Name), 
+                        GetString("Str_LaunchErrorTitle"), 
+                        MessageBoxButton.OK, 
+                        Application.Current.MainWindow);
+                });
                 return;
+            }
 
             try
             {

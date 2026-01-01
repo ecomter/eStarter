@@ -10,10 +10,15 @@ namespace eStarter.Views
             InitializeComponent();
         }
 
+        private string GetString(string key)
+        {
+            return Application.Current.Resources[key] as string ?? key;
+        }
+
         private async void ResetAppData_Click(object sender, RoutedEventArgs e)
         {
             var manager = new AppManager(new Services.AppInstaller());
-            var result = ModernMsgBox.ShowMessage("This will remove all installed app data. Continue?", "Confirm", MessageBoxButton.YesNo, this);
+            var result = ModernMsgBox.ShowMessage(GetString("Str_ResetAppDataPrompt"), GetString("Str_ConfirmTitle"), MessageBoxButton.YesNo, this);
             if (result == true)
             {
                 try
@@ -23,16 +28,16 @@ namespace eStarter.Views
                     if (System.IO.Directory.Exists(appsDir))
                     {
                         await System.Threading.Tasks.Task.Run(() => System.IO.Directory.Delete(appsDir, true));
-                        ModernMsgBox.ShowMessage("All app data removed.", "Success", MessageBoxButton.OK, this);
+                        ModernMsgBox.ShowMessage(GetString("Str_AppDataRemoved"), GetString("Str_SuccessTitle"), MessageBoxButton.OK, this);
                     }
                     else
                     {
-                        ModernMsgBox.ShowMessage("No app data found.", "Info", MessageBoxButton.OK, this);
+                        ModernMsgBox.ShowMessage(GetString("Str_NoAppDataFound"), GetString("Str_InfoTitle"), MessageBoxButton.OK, this);
                     }
                 }
                 catch (System.Exception ex)
                 {
-                    ModernMsgBox.ShowMessage($"Failed to remove app data: {ex.Message}", "Error", MessageBoxButton.OK, this);
+                    ModernMsgBox.ShowMessage(string.Format(GetString("Str_ResetFailed"), ex.Message), GetString("Str_ErrorTitle"), MessageBoxButton.OK, this);
                 }
             }
         }

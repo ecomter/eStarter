@@ -7,9 +7,12 @@
         xmlns:models="clr-namespace:eStarter.Models"
         xmlns:conv="clr-namespace:eStarter.Converters"
         mc:Ignorable="d"
-        Title="eStarter" Height="700" Width="1200"
+        Title="{DynamicResource Str_AppName}" Height="700" Width="1200"
         Background="{DynamicResource MetroBackgroundBrush}"
-        FontFamily="Segoe UI">
+        FontFamily="Microsoft YaHei UI, Segoe UI">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <!-- Start content (original main UI) -->
         <Grid x:Name="StartContent">
@@ -28,24 +31,24 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Metro Typography: Thin/Light title -->
-                    <TextBlock Text="Start" Style="{StaticResource MetroHeaderTextStyle}" Grid.Column="0"/>
+                    <TextBlock Text="{DynamicResource Str_Start}" Style="{StaticResource MetroHeaderTextStyle}" Grid.Column="0"/>
 
                     <!-- Metro Style Buttons -->
                     <StackPanel Orientation="Horizontal" 
                                Grid.Column="2" 
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center">
-                        <Button Content="refresh" 
-                               Command="{Binding RefreshCommand}" 
-                               Margin="5,0"
-                               Padding="20,10"
-                               Background="Transparent"
-                               Foreground="{DynamicResource MetroForegroundBrush}"
-                               BorderBrush="{DynamicResource MetroForegroundBrush}"
-                               BorderThickness="2"
-                               Cursor="Hand"
-                               FontSize="12"
-                               FontWeight="Normal">
+                        <Button Content="{DynamicResource Str_Refresh}" 
+                                Command="{Binding RefreshCommand}" 
+                                Margin="5,0"
+                                Padding="20,10"
+                                Background="Transparent"
+                                Foreground="{DynamicResource MetroForegroundBrush}"
+                                BorderBrush="{DynamicResource MetroForegroundBrush}"
+                                BorderThickness="2"
+                                Cursor="Hand"
+                                FontSize="12"
+                                FontWeight="Normal">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border Background="{TemplateBinding Background}"
@@ -67,16 +70,16 @@
                             </Button.Template>
                         </Button>
 
-                        <Button Content="install sample" 
-                               Command="{Binding InstallCommand}" 
-                               Margin="5,0"
-                               Padding="20,10"
-                               Background="{DynamicResource MetroAccentBrush}"
-                               Foreground="White"
-                               BorderThickness="0"
-                               Cursor="Hand"
-                               FontSize="12"
-                               FontWeight="Normal">
+                        <Button Content="{DynamicResource Str_InstallSample}" 
+                                Command="{Binding InstallCommand}" 
+                                Margin="5,0"
+                                Padding="20,10"
+                                Background="{DynamicResource MetroAccentBrush}"
+                                Foreground="White"
+                                BorderThickness="0"
+                                Cursor="Hand"
+                                FontSize="12"
+                                FontWeight="Normal">
                             <Button.Template>
                                 <ControlTemplate TargetType="Button">
                                     <Border x:Name="border" Background="{TemplateBinding Background}">
@@ -92,6 +95,57 @@
                                             <Setter TargetName="border" Property="Opacity" Value="0.6"/>
                                         </Trigger>
                                     </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- Search Button -->
+                        <Button Content="&#xE11A;" FontFamily="Segoe UI Symbol" FontSize="20"
+                                Command="{Binding OpenSearchCommand}"
+                                Margin="20,0,0,0" Padding="10"
+                                Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                Foreground="{DynamicResource MetroForegroundBrush}">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MetroSeparatorBrush}"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MetroAccentBrush}"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+
+                        <!-- User Profile -->
+                        <Button Margin="20,0,0,0" Padding="0" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                                Command="{Binding ToggleTimeCommand}" ToolTip="{DynamicResource Str_ToggleTimeTooltip}">
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel VerticalAlignment="Center" Margin="0,0,10,0" HorizontalAlignment="Right">
+                                    <TextBlock Text="{Binding UserName}" 
+                                               Foreground="{DynamicResource MetroForegroundBrush}" 
+                                               FontSize="14" 
+                                               HorizontalAlignment="Right"
+                                               FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding CurrentTime}" 
+                                               Foreground="{DynamicResource MetroForegroundBrush}" 
+                                               FontSize="12" 
+                                               Opacity="0.7" 
+                                               HorizontalAlignment="Right"
+                                               Visibility="{Binding ShowTime, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </StackPanel>
+                                <Border Width="40" Height="40" CornerRadius="20" Background="#FFCCCCCC">
+                                    <TextBlock Text="" FontFamily="Segoe UI Symbol" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" FontSize="20"/>
+                                </Border>
+                            </StackPanel>
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <ContentPresenter/>
                                 </ControlTemplate>
                             </Button.Template>
                         </Button>
@@ -114,39 +168,10 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type models:AppEntry}">
-                            <ContentControl>
+                            <ContentControl Loaded="Tile_Loaded" Opacity="0">
                                 <ContentControl.RenderTransform>
-                                    <TranslateTransform X="0"/>
+                                    <TranslateTransform X="400" Y="0"/>
                                 </ContentControl.RenderTransform>
-                                <ContentControl.Style>
-                                    <Style TargetType="ContentControl">
-                                        <Setter Property="Opacity" Value="0"/>
-                                        <Style.Triggers>
-                                            <EventTrigger RoutedEvent="Loaded">
-                                                <BeginStoryboard>
-                                                    <Storyboard>
-                                                        <DoubleAnimation Storyboard.TargetProperty="Opacity" 
-                                                                       From="0" To="1" 
-                                                                       Duration="0:0:0.3"
-                                                                       BeginTime="0:0:0.02">
-                                                            <DoubleAnimation.EasingFunction>
-                                                                <ExponentialEase EasingMode="EaseOut"/>
-                                                            </DoubleAnimation.EasingFunction>
-                                                        </DoubleAnimation>
-                                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
-                                                                       From="60" To="0" 
-                                                                       Duration="0:0:0.3"
-                                                                       BeginTime="0:0:0.02">
-                                                            <DoubleAnimation.EasingFunction>
-                                                                <ExponentialEase EasingMode="EaseOut"/>
-                                                            </DoubleAnimation.EasingFunction>
-                                                        </DoubleAnimation>
-                                                    </Storyboard>
-                                                </BeginStoryboard>
-                                            </EventTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
                                 
                                 <Button Style="{StaticResource MetroTileStyle}" 
                                        Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
@@ -176,6 +201,94 @@
                     Style="{StaticResource MetroBackButtonStyle}"
                     VerticalAlignment="Top" HorizontalAlignment="Left" Margin="30,30,0,0"
                     Click="BackButton_Click"/>
+        </Grid>
+
+        <!-- Search Pane (Windows 8 Style) -->
+        <Grid x:Name="SearchPane" Width="346" HorizontalAlignment="Right" 
+              Background="{DynamicResource MetroBackgroundBrush}">
+            <Grid.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="0" Opacity="0.4"/>
+            </Grid.Effect>
+            <Grid.RenderTransform>
+                <TranslateTransform X="350"/>
+            </Grid.RenderTransform>
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsSearchOpen}" Value="True">
+                            <DataTrigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
+                                                       To="0" Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <ExponentialEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.EnterActions>
+                            <DataTrigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
+                                                       To="350" Duration="0:0:0.3">
+                                            <DoubleAnimation.EasingFunction>
+                                                <ExponentialEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </DataTrigger.ExitActions>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="30,40,30,20">
+                <TextBlock Text="{DynamicResource Str_Search}" Style="{StaticResource MetroSubheaderTextStyle}" FontSize="24"/>
+                <TextBox x:Name="SearchBox" 
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         FontSize="16" Padding="5" Margin="0,10,0,0"
+                         BorderThickness="2" BorderBrush="{DynamicResource MetroAccentBrush}"/>
+            </StackPanel>
+
+            <ListView Grid.Row="1" ItemsSource="{Binding SearchResults}" 
+                      Background="Transparent" BorderThickness="0"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Button Style="{StaticResource MetroTileStyle}" 
+                                Command="{Binding DataContext.LaunchCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                                CommandParameter="{Binding}"
+                                HorizontalAlignment="Left"
+                                Margin="10,5"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+            </ListView>
+            
+            <!-- Close Search Button -->
+            <Button Content="&#xE106;" FontFamily="Segoe UI Symbol" FontSize="20"
+                    Command="{Binding CloseSearchCommand}"
+                    HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,20,20,0"
+                    Background="Transparent" BorderThickness="0" Foreground="{DynamicResource MetroForegroundBrush}">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
         </Grid>
     </Grid>
 </Window>
