@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using eStarter.Core.Kernel;
 
 namespace eStarter.Models
 {
@@ -36,5 +37,47 @@ namespace eStarter.Models
 
         [JsonPropertyName("tileSize")]
         public string? TileSize { get; set; } // "Small", "Medium", "Wide", "Large"
+
+        /// <summary>
+        /// Permissions requested by the app. Array of permission names.
+        /// Example: ["FileRead", "FileWrite", "Notification"]
+        /// </summary>
+        [JsonPropertyName("permissions")]
+        public string[]? Permissions { get; set; }
+
+        /// <summary>
+        /// Minimum API version required.
+        /// </summary>
+        [JsonPropertyName("minApiVersion")]
+        public int MinApiVersion { get; set; } = 1;
+
+        /// <summary>
+        /// Whether the app runs in sandbox mode (restricted permissions).
+        /// </summary>
+        [JsonPropertyName("sandboxed")]
+        public bool Sandboxed { get; set; } = true;
+
+        /// <summary>
+        /// Parse declared permissions to Permission flags.
+        /// </summary>
+        [JsonIgnore]
+        public Permission DeclaredPermissions
+        {
+            get
+            {
+                if (Permissions == null || Permissions.Length == 0)
+                    return Permission.Basic;
+
+                Permission result = Permission.None;
+                foreach (var p in Permissions)
+                {
+                    if (System.Enum.TryParse<Permission>(p, true, out var perm))
+                    {
+                        result |= perm;
+                    }
+                }
+                return result;
+            }
+        }
     }
 }

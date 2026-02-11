@@ -1,0 +1,90 @@
+<UserControl x:Class="eStarter.Views.Settings.AppsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="Microsoft YaHei, Segoe UI">
+    
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,20,0">
+        <StackPanel Margin="0,0,0,40">
+            <!-- Header -->
+            <TextBlock Text="Apps" 
+                       FontFamily="Microsoft YaHei Light, Segoe UI Light"
+                       FontSize="42" FontWeight="Light"
+                       Foreground="{DynamicResource MetroForegroundBrush}"
+                       Margin="0,0,0,30"/>
+
+            <!-- Storage Used -->
+            <TextBlock Text="App sizes" FontSize="18" FontWeight="Light"
+                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,0,0,15"/>
+            
+            <Grid Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ProgressBar Height="8" Value="35" Maximum="100"
+                             Background="#FF333333" Foreground="{DynamicResource MetroAccentBrush}"
+                             BorderThickness="0"/>
+                <TextBlock Grid.Column="1" Text="{Binding StorageUsedText}" 
+                           FontSize="13" Margin="15,0,0,0"
+                           Foreground="{DynamicResource MetroForegroundBrush}"/>
+            </Grid>
+
+            <!-- Installed Apps List -->
+            <TextBlock Text="Installed apps" FontSize="18" FontWeight="Light"
+                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,20,0,15"/>
+            
+            <TextBlock Text="Click an app to see options and storage info." 
+                       FontSize="13" Foreground="{DynamicResource MetroForegroundBrush}"
+                       Opacity="0.8" Margin="0,0,0,15"/>
+
+            <ItemsControl ItemsSource="{Binding InstalledApps}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" 
+                                BorderThickness="0,0,0,1" Padding="0,12" Cursor="Hand">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                
+                                <!-- App Icon Placeholder -->
+                                <Border Grid.Column="0" Width="40" Height="40" 
+                                        Background="{DynamicResource MetroAccentBrush}">
+                                    <TextBlock Text="&#xE179;" FontFamily="Segoe UI Symbol"
+                                               FontSize="20" Foreground="White"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                
+                                <!-- App Info -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                                    <TextBlock Text="{Binding Name}" FontSize="14"
+                                               Foreground="{DynamicResource MetroForegroundBrush}"/>
+                                    <TextBlock Text="{Binding Publisher}" FontSize="11"
+                                               Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
+                                </StackPanel>
+                                
+                                <!-- Storage -->
+                                <TextBlock Grid.Column="2" Text="{Binding StorageText}" 
+                                           FontSize="13" VerticalAlignment="Center"
+                                           Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.7"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <!-- Running Apps -->
+            <TextBlock Text="Running apps" FontSize="18" FontWeight="Light"
+                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,30,0,15"/>
+            
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontSize="14" Foreground="{DynamicResource MetroForegroundBrush}">
+                    <Run Text="{Binding RunningAppsCount, Mode=OneWay}"/>
+                    <Run Text=" apps currently running"/>
+                </TextBlock>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

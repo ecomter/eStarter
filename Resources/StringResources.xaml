@@ -12,7 +12,7 @@
     <sys:String x:Key="Str_ToggleTimeTooltip">Click to toggle time display</sys:String>
     
     <!-- Settings Navigation -->
-    <sys:String x:Key="Str_PCSettings">PC settings</sys:String>
+    <sys:String x:Key="Str_PCSettings">Settings</sys:String>
     <sys:String x:Key="Str_Personalization">Personalization</sys:String>
     <sys:String x:Key="Str_SearchApps">Search and apps</sys:String>
     <sys:String x:Key="Str_Privacy">Privacy</sys:String>

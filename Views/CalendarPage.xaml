@@ -1,0 +1,141 @@
+<UserControl x:Class="eStarter.Views.CalendarPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:vm="clr-namespace:eStarter.ViewModels"
+             xmlns:conv="clr-namespace:eStarter.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="768" d:DesignWidth="1366"
+             FontFamily="Microsoft YaHei, Segoe UI">
+    
+    <UserControl.DataContext>
+        <vm:CalendarViewModel/>
+    </UserControl.DataContext>
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+    </UserControl.Resources>
+
+    <Grid Background="#FFEAEAEA"> <!-- Light gray background like in the image -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Header -->
+            <RowDefinition Height="Auto"/> <!-- Weekdays -->
+            <RowDefinition Height="*"/>    <!-- Calendar Grid -->
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="100,30,40,20">
+            <StackPanel Orientation="Horizontal" Cursor="Hand" MouseLeftButtonUp="Header_Click" Background="Transparent">
+                <TextBlock Text="{Binding HeaderText}" FontSize="56" FontWeight="Light" Foreground="#FF333333" Margin="0,0,10,0"/>
+                <TextBlock Text="∨" FontSize="30" VerticalAlignment="Center" Foreground="#FF666666" Margin="0,10,0,0"/>
+            </StackPanel>
+            
+            <!-- Hidden DatePicker for switching Month/Year -->
+            <DatePicker x:Name="MonthPicker" 
+                        SelectedDate="{Binding CurrentDate, Mode=TwoWay}"
+                        Width="0" Height="0" Opacity="0"
+                        IsDropDownOpen="False"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top">
+                <TextBlock Text="正在同步..." FontSize="12" Foreground="#FF666666"/>
+            </StackPanel>
+            
+            <!-- Navigation Buttons (Hidden but functional via commands if needed, or we can add visible buttons) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Button Content="&lt;" Command="{Binding PreviousMonthCommand}" Style="{StaticResource MetroPushButtonStyle}" Margin="0,0,10,0"/>
+                <Button Content="Today" Command="{Binding GoToTodayCommand}" Style="{StaticResource MetroPushButtonStyle}" Margin="0,0,10,0"/>
+                <Button Content="&gt;" Command="{Binding NextMonthCommand}" Style="{StaticResource MetroPushButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Weekday Headers -->
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding WeekDays}" Margin="40,0,40,10">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="7"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" FontSize="14" Foreground="#FF666666" Margin="5,0"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- Calendar Grid -->
+        <ItemsControl Grid.Row="2" ItemsSource="{Binding Days}" Margin="40,0,40,40">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="7" Rows="6"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border BorderBrush="#FFCCCCCC" BorderThickness="0,1,1,0" Background="Transparent">
+                        <Grid>
+                            <!-- Today Highlight -->
+                            <Border Background="#FF666666" Visibility="{Binding IsToday, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            
+                            <Grid Margin="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <!-- Day Number -->
+                                <TextBlock Text="{Binding DayNumber}" FontSize="16">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FF333333"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsCurrentMonth}" Value="False">
+                                                    <Setter Property="Foreground" Value="#FF999999"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsToday}" Value="True">
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                    <Setter Property="FontWeight" Value="Bold"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Events List -->
+                                <ItemsControl Grid.Row="1" ItemsSource="{Binding Events}" Margin="0,5,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,0,0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="4"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Rectangle Fill="{Binding Color}" Width="4" Height="16" VerticalAlignment="Top"/>
+                                                <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                                    <TextBlock Text="{Binding Title}" FontSize="12" FontWeight="Bold" TextTrimming="CharacterEllipsis">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Setter Property="Foreground" Value="{Binding Color}"/>
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Border}, Path=DataContext.IsToday}" Value="True">
+                                                                        <Setter Property="Foreground" Value="White"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                    <TextBlock Text="{Binding Time}" FontSize="11" Foreground="#FF00A1F1" Visibility="{Binding Time, Converter={StaticResource StringToVisibilityConverter}}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>

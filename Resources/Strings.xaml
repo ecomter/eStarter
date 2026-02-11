@@ -12,14 +12,21 @@
     <sys:String x:Key="Str_ToggleTimeTooltip">Click to toggle time display</sys:String>
     
     <!-- Settings Navigation -->
-    <sys:String x:Key="Str_PCSettings">PC settings</sys:String>
-    <sys:String x:Key="Str_Personalization">Personalization</sys:String>
+    <sys:String x:Key="Str_PCSettings">Settings</sys:String>
+    <sys:String x:Key="Str_Personalization">Personalize</sys:String>
+    <sys:String x:Key="Str_PersonalizationDesc">Pick your colors and pictures.</sys:String>
     <sys:String x:Key="Str_SearchApps">Search and apps</sys:String>
+    <sys:String x:Key="Str_SearchAppsDesc">Search settings and app permissions.</sys:String>
     <sys:String x:Key="Str_Privacy">Privacy</sys:String>
+    <sys:String x:Key="Str_PrivacyDesc">Control how apps use your personal info.</sys:String>
     <sys:String x:Key="Str_TimeLanguage">Time and language</sys:String>
+    <sys:String x:Key="Str_TimeLanguageDesc">Change date, time, region, and language.</sys:String>
     <sys:String x:Key="Str_EaseAccess">Ease of Access</sys:String>
+    <sys:String x:Key="Str_EaseAccessDesc">Adjust settings for vision, hearing, and mobility.</sys:String>
     <sys:String x:Key="Str_UpdateRecovery">Update and recovery</sys:String>
+    <sys:String x:Key="Str_UpdateRecoveryDesc">Windows Update, recovery, and backup.</sys:String>
     <sys:String x:Key="Str_About">About</sys:String>
+    <sys:String x:Key="Str_AboutShortDesc">System information.</sys:String>
 
     <!-- Personalization -->
     <sys:String x:Key="Str_StartScreen">Start screen</sys:String>

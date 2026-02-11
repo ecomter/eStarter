@@ -9,10 +9,12 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using eStarter.Core;
+using eStarter.Core.Kernel;
 using eStarter.Models;
 using eStarter.Services;
 using eStarter.Views;
 using System;
+using System.Text.Json;
 
 namespace eStarter.ViewModels
 {
@@ -33,6 +35,7 @@ namespace eStarter.ViewModels
         public ICommand CloseSearchCommand { get; }
         public ICommand OpenSearchCommand { get; }
         public ICommand ToggleTimeCommand { get; }
+        public ICommand TestIpcCommand { get; }
 
         private readonly AppManager _manager;
         private readonly ISettingsService _settingsService;
@@ -42,6 +45,10 @@ namespace eStarter.ViewModels
         private string _userName = System.Environment.UserName;
         private string _currentTime = System.DateTime.Now.ToString("t");
         private System.Windows.Threading.DispatcherTimer _timer;
+        private int _runningProcessCount;
+
+        // Kernel Service accessor
+        private KernelService KernelSvc => KernelService.Instance;
 
         private string GetString(string key) => Application.Current.Resources[key] as string ?? key;
 
@@ -157,6 +164,12 @@ namespace eStarter.ViewModels
             }
         }
 
+        public int RunningProcessCount
+        {
+            get => _runningProcessCount;
+            set { _runningProcessCount = value; OnPropertyChanged(); }
+        }
+
         public ObservableCollection<string> AvailableAccentColors { get; } = new ObservableCollection<string>
         {
             "#FF0078D7", "#FF1BA1E2", "#FFD24726", "#FFF09609", 
@@ -170,6 +183,14 @@ namespace eStarter.ViewModels
             _manager = new AppManager(installer);
             _settingsService = new SettingsService();
 
+            // Subscribe to Kernel events
+            if (KernelSvc.IsRunning)
+            {
+                KernelSvc.ProcessStarted += OnProcessStarted;
+                KernelSvc.ProcessTerminated += OnProcessTerminated;
+                KernelSvc.PermissionRequested += OnPermissionRequested;
+            }
+
             RefreshCommand = new RelayCommand(_ => Refresh());
             InstallCommand = new RelayCommand(async _ => await InstallAsync());
             LaunchCommand = new RelayCommand(param => LaunchApp(param as AppEntry));
@@ -180,6 +201,7 @@ namespace eStarter.ViewModels
             CloseSearchCommand = new RelayCommand(_ => IsSearchOpen = false);
             OpenSearchCommand = new RelayCommand(_ => IsSearchOpen = true);
             ToggleTimeCommand = new RelayCommand(_ => ShowTime = !ShowTime);
+            TestIpcCommand = new RelayCommand(async _ => await TestConnectionAsync());
 
             // Setup Timer
             _timer = new System.Windows.Threading.DispatcherTimer();
@@ -189,6 +211,41 @@ namespace eStarter.ViewModels
 
             // Initialize async but handle exceptions properly
             Task.Run(async () => await InitializeAsync());
+        }
+
+        // Kernel event handlers
+        private void OnProcessStarted(ProcessInfo process)
+        {
+            Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                RunningProcessCount = KernelSvc.Kernel.GetAllProcesses().Length;
+                Debug.WriteLine($"[UI] Process started: {process.AppId}");
+            });
+        }
+
+        private void OnProcessTerminated(ProcessInfo process)
+        {
+            Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                RunningProcessCount = KernelSvc.Kernel.GetAllProcesses().Length;
+                Debug.WriteLine($"[UI] Process terminated: {process.AppId}");
+            });
+        }
+
+        private void OnPermissionRequested(string appId, Permission permission)
+        {
+            Application.Current?.Dispatcher?.Invoke(() =>
+            {
+                // Find app name for display
+                var app = InstalledApps.FirstOrDefault(a => a.Id == appId);
+                var appName = app?.Name ?? appId;
+
+                // Show permission dialog
+                var result = PermissionDialog.ShowPermissionRequest(appId, permission, appName);
+
+                // Complete the request
+                KernelSvc.Permissions.CompleteRequest(appId, permission, result == true);
+            });
         }
 
         private void UpdateCurrentTime()
@@ -505,6 +562,29 @@ namespace eStarter.ViewModels
             }
         }
 
+        public void LaunchAppById(string appId, string arguments = "")
+        {
+            var app = InstalledApps.FirstOrDefault(a => a.Id == appId);
+            if (app != null)
+            {
+                // Temporarily override arguments if provided
+                var originalArgs = app.Arguments;
+                if (!string.IsNullOrEmpty(arguments)) app.Arguments = arguments;
+
+                LaunchApp(app);
+
+                // Restore arguments
+                if (!string.IsNullOrEmpty(arguments)) app.Arguments = originalArgs;
+            }
+            else
+            {
+                // Handle "demo" or special apps that might not be in the list but are valid targets
+                // Or create a temporary entry for launch
+                var tempEntry = new AppEntry { Id = appId, Name = appId, Arguments = arguments };
+                LaunchApp(tempEntry);
+            }
+        }
+
         private void LaunchApp(AppEntry? app)
         {
             if (app == null || string.IsNullOrWhiteSpace(app.Id))
@@ -528,6 +608,17 @@ namespace eStarter.ViewModels
                 {
                     var mw = Application.Current?.MainWindow as MainWindow;
                     mw?.ShowPage(new Views.SettingsPage());
+                });
+                return;
+            }
+
+            // If it's the Calendar tile, navigate to CalendarPage inside main window
+            if (app.Id == "demo.calendar")
+            {
+                Application.Current?.Dispatcher?.Invoke(() =>
+                {
+                    var mw = Application.Current?.MainWindow as MainWindow;
+                    mw?.ShowPage(new Views.CalendarPage());
                 });
                 return;
             }
@@ -634,6 +725,22 @@ namespace eStarter.ViewModels
         private async Task SaveSettingsAsync()
         {
             await _settingsService.SaveTileConfigurationAsync(InstalledApps);
+        }
+
+        private async Task TestConnectionAsync()
+        {
+            try
+            {
+                // Test notification through KernelService
+                await KernelSvc.Notifications.ShowAsync(
+                    "System API Test",
+                    "This is a test notification from the system!",
+                    NotificationType.Info);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Test Failed: {ex.Message}");
+            }
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

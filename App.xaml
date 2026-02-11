@@ -2,6 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:eStarter"
+             xmlns:conv="clr-namespace:eStarter.Converters"
              Startup="Application_Startup">
     <Application.Resources>
         <ResourceDictionary>
@@ -9,13 +10,19 @@
                 <ResourceDictionary Source="Styles/MetroStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Strings.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-            
+
+            <!-- Converters -->
+            <conv:CategoryToVisibilityConverter x:Key="CategoryToVisibilityConverter"/>
+            <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+            <conv:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>
+            <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+
             <!-- Dynamic Theme Resources -->
-            <Color x:Key="MetroAccentColor">#FF0078D7</Color>
+            <Color x:Key="MetroAccentColor">#FF00B159</Color>
             <SolidColorBrush x:Key="MetroAccentBrush" Color="{DynamicResource MetroAccentColor}"/>
-            <SolidColorBrush x:Key="MetroBackgroundBrush" Color="#FF1F1F1F"/>
-            <SolidColorBrush x:Key="MetroForegroundBrush" Color="White"/>
-            <SolidColorBrush x:Key="MetroSeparatorBrush" Color="#33FFFFFF"/>
+            <SolidColorBrush x:Key="MetroBackgroundBrush" Color="#FFFFFFFF"/>
+            <SolidColorBrush x:Key="MetroForegroundBrush" Color="#FF1D1D1D"/>
+            <SolidColorBrush x:Key="MetroSeparatorBrush" Color="#33000000"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

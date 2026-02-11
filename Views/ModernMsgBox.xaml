@@ -7,7 +7,7 @@
         Background="{DynamicResource MetroBackgroundBrush}"
         BorderBrush="{DynamicResource MetroAccentBrush}" BorderThickness="1"
         ShowInTaskbar="False"
-        FontFamily="Microsoft YaHei UI, Segoe UI">
+        FontFamily="Microsoft YaHei, Segoe UI">
     <Grid Margin="20" RenderTransformOrigin="0.5,0.5">
         <Grid.RenderTransform>
             <ScaleTransform x:Name="WindowScale" ScaleX="0.9" ScaleY="0.9"/>
@@ -19,11 +19,11 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" x:Name="TitleText" Text="Title" 
-                   FontFamily="Microsoft YaHei UI Light, Segoe UI Light" FontSize="24" Foreground="{DynamicResource MetroForegroundBrush}" 
+                   FontFamily="Microsoft YaHei Light, Segoe UI Light" FontSize="24" Foreground="{DynamicResource MetroForegroundBrush}" 
                    Margin="0,0,0,15"/>
 
         <TextBlock Grid.Row="1" x:Name="MessageText" Text="Message content goes here." 
-                   FontFamily="Microsoft YaHei UI, Segoe UI" FontSize="14" Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.8"
+                   FontFamily="Microsoft YaHei, Segoe UI" FontSize="14" Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.8"
                    TextWrapping="Wrap" VerticalAlignment="Center"/>
 
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">

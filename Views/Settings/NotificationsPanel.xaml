@@ -1,0 +1,120 @@
+<UserControl x:Class="eStarter.Views.Settings.NotificationsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FontFamily="Microsoft YaHei, Segoe UI">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,20,0">
+        <StackPanel Margin="0,0,0,40">
+            <!-- Header -->
+            <TextBlock Text="Notifications" 
+                       FontFamily="Microsoft YaHei Light, Segoe UI Light"
+                       FontSize="42" FontWeight="Light"
+                       Foreground="{DynamicResource MetroForegroundBrush}"
+                       Margin="0,0,0,30"/>
+
+            <!-- Show Notifications Toggle -->
+            <TextBlock Text="Show app notifications" FontSize="18" FontWeight="Light"
+                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,0,0,15"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <TextBlock Text="Show app notifications" FontSize="14" Width="250" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <ToggleButton Style="{StaticResource MetroToggleSwitchStyle}"
+                              IsChecked="{Binding ShowNotifications, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <!-- Show on Lock Screen -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                <TextBlock Text="Show notifications on lock screen" FontSize="14" Width="250" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <ToggleButton Style="{StaticResource MetroToggleSwitchStyle}"
+                              IsChecked="{Binding ShowLockScreenNotifications, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <!-- Play Sound -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                <TextBlock Text="Play notification sounds" FontSize="14" Width="250" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <ToggleButton Style="{StaticResource MetroToggleSwitchStyle}"
+                              IsChecked="{Binding PlayNotificationSounds, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <!-- Quiet Hours -->
+            <TextBlock Text="Quiet hours" FontSize="18" FontWeight="Light"
+                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,30,0,15"/>
+
+            <TextBlock Text="During quiet hours, notifications won't make sounds or appear on screen."
+                       FontSize="13" Foreground="{DynamicResource MetroForegroundBrush}"
+                       Opacity="0.8" Margin="0,0,0,15" TextWrapping="Wrap"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                <TextBlock Text="Quiet hours" FontSize="14" Width="150" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <ToggleButton Style="{StaticResource MetroToggleSwitchStyle}"
+                              IsChecked="{Binding QuietHoursEnabled, Mode=TwoWay}"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                <TextBlock Text="From" FontSize="14" Width="150" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <ComboBox Width="100" Height="30" SelectedIndex="0"
+                          Style="{StaticResource MetroComboBoxStyle}">
+                    <ComboBoxItem Content="10:00 PM"/>
+                    <ComboBoxItem Content="11:00 PM"/>
+                    <ComboBoxItem Content="12:00 AM"/>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,30">
+                <TextBlock Text="To" FontSize="14" Width="150" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MetroForegroundBrush}"/>
+                <ComboBox Width="100" Height="30" SelectedIndex="2"
+                          Style="{StaticResource MetroComboBoxStyle}">
+                    <ComboBoxItem Content="6:00 AM"/>
+                    <ComboBoxItem Content="7:00 AM"/>
+                    <ComboBoxItem Content="8:00 AM"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- App Notifications -->
+            <TextBlock Text="Show notifications from these apps" FontSize="18" FontWeight="Light"
+                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,0,0,15"/>
+
+            <StackPanel>
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Mail" FontSize="14" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MetroForegroundBrush}"/>
+                        <ToggleButton Grid.Column="1" Style="{StaticResource MetroToggleSwitchStyle}" IsChecked="True"/>
+                    </Grid>
+                </Border>
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Calendar" FontSize="14" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MetroForegroundBrush}"/>
+                        <ToggleButton Grid.Column="1" Style="{StaticResource MetroToggleSwitchStyle}" IsChecked="True"/>
+                    </Grid>
+                </Border>
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="System" FontSize="14" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource MetroForegroundBrush}"/>
+                        <ToggleButton Grid.Column="1" Style="{StaticResource MetroToggleSwitchStyle}" IsChecked="True"/>
+                    </Grid>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

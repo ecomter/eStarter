@@ -9,7 +9,7 @@
         mc:Ignorable="d"
         Title="{DynamicResource Str_AppName}" Height="700" Width="1200"
         Background="{DynamicResource MetroBackgroundBrush}"
-        FontFamily="Microsoft YaHei UI, Segoe UI">
+        FontFamily="Microsoft YaHei, Segoe UI">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Window.Resources>

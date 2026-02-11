@@ -1,0 +1,138 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:services="clr-namespace:eStarter.Services">
+
+    <!-- Metro Toast Notification Style -->
+    <Style x:Key="MetroToastStyle" TargetType="Border">
+        <Setter Property="Background" Value="#FF1F1F1F"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="MinWidth" Value="320"/>
+        <Setter Property="MaxWidth" Value="400"/>
+        <Setter Property="Margin" Value="0,0,0,8"/>
+        <Setter Property="Padding" Value="16"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="RenderTransformOrigin" Value="1,0.5"/>
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <TranslateTransform X="0"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Notification Container (positioned top-right) -->
+    <Style x:Key="NotificationContainerStyle" TargetType="ItemsControl">
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+        <Setter Property="VerticalAlignment" Value="Top"/>
+        <Setter Property="Margin" Value="0,60,20,0"/>
+        <Setter Property="Width" Value="380"/>
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Notification Item Template -->
+    <DataTemplate x:Key="NotificationItemTemplate" DataType="{x:Type services:NotificationItem}">
+        <Border Style="{StaticResource MetroToastStyle}" 
+                x:Name="ToastBorder">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="2" BlurRadius="8" Opacity="0.3"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Type Icon with accent color -->
+                <Border Grid.Column="0" 
+                        Width="4" 
+                        Margin="-16,-16,12,-16"
+                        Background="{Binding AccentColor}"/>
+
+                <TextBlock Grid.Column="0" 
+                           Text="{Binding Icon}" 
+                           FontFamily="Segoe UI Symbol" 
+                           FontSize="20"
+                           Foreground="{Binding AccentColor}"
+                           VerticalAlignment="Center"
+                           Margin="8,0,12,0"/>
+
+                <!-- Content -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title}" 
+                               FontWeight="SemiBold" 
+                               FontSize="14"
+                               Foreground="White"
+                               TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Message}" 
+                               FontSize="12"
+                               Foreground="#CCFFFFFF"
+                               TextWrapping="Wrap"
+                               MaxHeight="40"
+                               TextTrimming="CharacterEllipsis"
+                               Margin="0,4,0,0"/>
+                    <TextBlock Text="{Binding AppId}" 
+                               FontSize="10"
+                               Foreground="#66FFFFFF"
+                               Margin="0,4,0,0"
+                               Visibility="{Binding AppId, Converter={StaticResource StringToVisibilityConverter}}"/>
+                </StackPanel>
+
+                <!-- Close Button (handled in code-behind of host) -->
+                <Button Grid.Column="2" 
+                        Content="&#xE10A;" 
+                        FontFamily="Segoe UI Symbol"
+                        FontSize="12"
+                        Background="Transparent"
+                        Foreground="#99FFFFFF"
+                        BorderThickness="0"
+                        Padding="8"
+                        Cursor="Hand"
+                        VerticalAlignment="Top"
+                        Margin="8,-8,-8,0"
+                        Tag="{Binding Id}">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Border>
+
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsClosing}" Value="True">
+                <DataTrigger.EnterActions>
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetName="ToastBorder"
+                                           Storyboard.TargetProperty="Opacity"
+                                           To="0" Duration="0:0:0.3"/>
+                            <DoubleAnimation Storyboard.TargetName="ToastBorder"
+                                           Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                           To="400" Duration="0:0:0.3">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseIn"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </DataTrigger.EnterActions>
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+</ResourceDictionary>

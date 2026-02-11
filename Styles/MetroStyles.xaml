@@ -8,9 +8,267 @@
     <conv:TileSizeToFontSizeConverter x:Key="TileSizeToFontSizeConverter" />
     <conv:TileSizeToVisibilityConverter x:Key="TileSizeToVisibilityConverter" />
 
+    <!-- Metro Toggle Switch Style -->
+    <Style x:Key="MetroToggleSwitchStyle" TargetType="ToggleButton">
+        <Setter Property="Width" Value="60"/>
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Grid>
+                        <Border x:Name="Track" 
+                                Background="#FF666666" 
+                                CornerRadius="12"
+                                Padding="2">
+                            <Canvas>
+                                <Border x:Name="Thumb" 
+                                        Width="20" Height="20" 
+                                        CornerRadius="10"
+                                        Background="White"
+                                        Canvas.Left="0">
+                                    <Border.RenderTransform>
+                                        <TranslateTransform x:Name="ThumbTransform" X="0"/>
+                                    </Border.RenderTransform>
+                                </Border>
+                            </Canvas>
+                        </Border>
+
+                        <!-- On/Off Text -->
+                        <TextBlock x:Name="OnText" Text="On" 
+                                   FontSize="10" Foreground="White"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center"
+                                   Margin="8,0,0,0" Visibility="Collapsed"/>
+                        <TextBlock x:Name="OffText" Text="Off" 
+                                   FontSize="10" Foreground="White"
+                                   HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   Margin="0,0,8,0"/>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="{DynamicResource MetroAccentBrush}"/>
+                            <Setter TargetName="OnText" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="OffText" Property="Visibility" Value="Collapsed"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ThumbTransform"
+                                                        Storyboard.TargetProperty="X"
+                                                        To="36" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ThumbTransform"
+                                                        Storyboard.TargetProperty="X"
+                                                        To="0" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Track" Property="Opacity" Value="0.9"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Metro CheckBox Style -->
+    <Style x:Key="MetroCheckBoxStyle" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{DynamicResource MetroForegroundBrush}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border x:Name="CheckBorder" 
+                                Width="20" Height="20"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource MetroForegroundBrush}"
+                                Background="Transparent">
+                            <Grid>
+                                <TextBlock x:Name="CheckMark" 
+                                           Text="&#xE10B;"
+                                           FontFamily="Segoe UI Symbol"
+                                           FontSize="14"
+                                           Foreground="White"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           Opacity="0">
+                                    <TextBlock.RenderTransform>
+                                        <ScaleTransform x:Name="CheckMarkScale" ScaleX="0" ScaleY="0" CenterX="7" CenterY="7"/>
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
+                            </Grid>
+                        </Border>
+
+                        <ContentPresenter Grid.Column="1" 
+                                          Margin="10,0,0,0"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"/>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="CheckBorder" Property="Background" Value="{DynamicResource MetroAccentBrush}"/>
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource MetroAccentBrush}"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="CheckMark"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="1" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
+                                                        Storyboard.TargetProperty="ScaleX"
+                                                        To="1" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
+                                                        Storyboard.TargetProperty="ScaleY"
+                                                        To="1" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="CheckMark"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="0" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
+                                                        Storyboard.TargetProperty="ScaleX"
+                                                        To="0" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
+                                                        Storyboard.TargetProperty="ScaleY"
+                                                        To="0" Duration="0:0:0.1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CheckBorder" Property="BorderBrush" Value="{DynamicResource MetroAccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Metro RadioButton Style -->
+    <Style x:Key="MetroRadioButtonStyle" TargetType="RadioButton">
+        <Setter Property="Foreground" Value="{DynamicResource MetroForegroundBrush}"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Border x:Name="RadioBorder" 
+                                Width="20" Height="20"
+                                CornerRadius="10"
+                                BorderThickness="2"
+                                BorderBrush="{DynamicResource MetroForegroundBrush}"
+                                Background="Transparent">
+                            <Ellipse x:Name="RadioDot"
+                                     Width="10" Height="10"
+                                     Fill="{DynamicResource MetroAccentBrush}"
+                                     Opacity="0">
+                                <Ellipse.RenderTransform>
+                                    <ScaleTransform x:Name="RadioDotScale" ScaleX="0" ScaleY="0" CenterX="5" CenterY="5"/>
+                                </Ellipse.RenderTransform>
+                            </Ellipse>
+                        </Border>
+
+                        <ContentPresenter Grid.Column="1" 
+                                          Margin="10,0,0,0"
+                                          VerticalAlignment="Center"
+                                          RecognizesAccessKey="True"/>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="RadioBorder" Property="BorderBrush" Value="{DynamicResource MetroAccentBrush}"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="RadioDot"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="1" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="RadioDotScale"
+                                                        Storyboard.TargetProperty="ScaleX"
+                                                        To="1" Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.4"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="RadioDotScale"
+                                                        Storyboard.TargetProperty="ScaleY"
+                                                        To="1" Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <BackEase EasingMode="EaseOut" Amplitude="0.4"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="RadioDot"
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="0" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="RadioDotScale"
+                                                        Storyboard.TargetProperty="ScaleX"
+                                                        To="0" Duration="0:0:0.1"/>
+                                        <DoubleAnimation Storyboard.TargetName="RadioDotScale"
+                                                        Storyboard.TargetProperty="ScaleY"
+                                                        To="0" Duration="0:0:0.1"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RadioBorder" Property="BorderBrush" Value="{DynamicResource MetroAccentBrush}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Metro Header Text Style -->
     <Style x:Key="MetroHeaderTextStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe UI Light"/>
+        <Setter Property="FontFamily" Value="Microsoft YaHei Light, Segoe UI Light"/>
         <Setter Property="FontSize" Value="42"/>
         <Setter Property="FontWeight" Value="Light"/>
         <Setter Property="Foreground" Value="{DynamicResource MetroForegroundBrush}"/>
@@ -20,7 +278,7 @@
 
     <!-- Metro Subheader Text Style -->
     <Style x:Key="MetroSubheaderTextStyle" TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="Segoe UI Light"/>
+        <Setter Property="FontFamily" Value="Microsoft YaHei Light, Segoe UI Light"/>
         <Setter Property="FontSize" Value="20"/>
         <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="Foreground" Value="{DynamicResource MetroForegroundBrush}"/>
@@ -304,7 +562,7 @@
         <Setter Property="Foreground" Value="{DynamicResource MetroForegroundBrush}"/>
         <Setter Property="Opacity" Value="0.8"/>
         <Setter Property="FontSize" Value="16"/>
-        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontFamily" Value="Microsoft YaHei, Segoe UI"/>
         <Setter Property="Padding" Value="10,8"/>
         <Setter Property="Margin" Value="0,0,0,2"/>
         <Setter Property="Cursor" Value="Hand"/>
@@ -318,9 +576,11 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource MetroForegroundBrush}"/>
                             <Setter Property="Opacity" Value="1.0"/>
+                            <Setter Property="Background" Value="#19888888"/>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Foreground" Value="{DynamicResource MetroAccentBrush}"/>
+                            <Setter Property="Background" Value="{DynamicResource MetroAccentBrush}"/>
+                            <Setter Property="Foreground" Value="White"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                             <Setter Property="Opacity" Value="1.0"/>
                         </Trigger>
