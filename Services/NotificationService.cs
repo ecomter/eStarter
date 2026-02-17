@@ -6,14 +6,6 @@ using System.Windows.Threading;
 
 namespace eStarter.Services
 {
-    public enum NotificationType
-    {
-        Info,
-        Success,
-        Warning,
-        Error
-    }
-
     public sealed class NotificationItem
     {
         public string Id { get; } = Guid.NewGuid().ToString();

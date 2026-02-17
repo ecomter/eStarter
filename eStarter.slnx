@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="eStarter.Abstractions/eStarter.Abstractions.csproj" />
+  <Project Path="eStarter.Core/eStarter.Core.csproj" />
   <Project Path="eStarter.csproj" />
 </Solution>

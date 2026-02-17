@@ -11,4 +11,19 @@
     <StartupObject></StartupObject>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Exclude sub-projects from compilation (they are separate projects) -->
+    <Compile Remove="eStarter.Core\**" />
+    <Compile Remove="eStarter.Abstractions\**" />
+    <None Remove="eStarter.Core\**" />
+    <None Remove="eStarter.Abstractions\**" />
+    <EmbeddedResource Remove="eStarter.Core\**" />
+    <EmbeddedResource Remove="eStarter.Abstractions\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="eStarter.Core\eStarter.Core.csproj" />
+    <ProjectReference Include="eStarter.Abstractions\eStarter.Abstractions.csproj" />
+  </ItemGroup>
+
 </Project>
