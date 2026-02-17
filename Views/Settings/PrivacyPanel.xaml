@@ -12,294 +12,235 @@
                        Foreground="{DynamicResource MetroForegroundBrush}"
                        Margin="0,0,0,30"/>
 
-            <!-- Privacy Dashboard (Android 16 style) -->
+            <!-- Privacy Dashboard — live data from kernel -->
             <TextBlock Text="Privacy dashboard" FontSize="18" FontWeight="Light"
                        Foreground="{DynamicResource MetroAccentBrush}" Margin="0,0,0,15"/>
 
-            <TextBlock Text="See which apps used your permissions in the last 24 hours."
+            <TextBlock Text="Apps with active permission grants from the kernel."
                        FontSize="13" Foreground="{DynamicResource MetroForegroundBrush}"
                        Opacity="0.8" Margin="0,0,0,20"/>
 
-            <!-- Permission Cards Grid -->
-            <UniformGrid Columns="3" Margin="0,0,0,30">
-                <!-- Location Card -->
-                <Border Background="{DynamicResource MetroSeparatorBrush}" 
-                        Margin="0,0,10,10" Padding="15" CornerRadius="4">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,10">
-                            <Ellipse Width="40" Height="40" Fill="{DynamicResource MetroAccentBrush}" Opacity="0.2"/>
-                            <TextBlock Text="&#xE1D1;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="{DynamicResource MetroAccentBrush}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <TextBlock Text="Location" FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="0 apps" FontSize="12" Opacity="0.6"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
+            <!-- Dashboard tiles — flat Metro squares, like Start Screen tiles -->
+            <StackPanel x:Name="PermissionDashboard">
+                <UniformGrid Columns="3" Margin="0,0,0,4">
+                    <!-- Location -->
+                    <Border Background="{DynamicResource MetroAccentBrush}" Margin="0,0,4,0" Padding="15,18">
+                        <StackPanel>
+                            <TextBlock Text="&#xE1D1;" FontFamily="Segoe UI Symbol" FontSize="24"
+                                       Foreground="White" Margin="0,0,0,8"/>
+                            <TextBlock Text="Location" FontSize="13" Foreground="White"/>
+                            <TextBlock Text="{Binding LocationAppText}" FontSize="11" 
+                                       Foreground="White" Opacity="0.7"/>
+                        </StackPanel>
+                    </Border>
+                    <!-- Camera -->
+                    <Border Background="#FF4CAF50" Margin="0,0,4,0" Padding="15,18">
+                        <StackPanel>
+                            <TextBlock Text="&#xE114;" FontFamily="Segoe UI Symbol" FontSize="24"
+                                       Foreground="White" Margin="0,0,0,8"/>
+                            <TextBlock Text="Camera" FontSize="13" Foreground="White"/>
+                            <TextBlock Text="{Binding CameraAppText}" FontSize="11" 
+                                       Foreground="White" Opacity="0.7"/>
+                        </StackPanel>
+                    </Border>
+                    <!-- Microphone -->
+                    <Border Background="#FFFF9800" Padding="15,18">
+                        <StackPanel>
+                            <TextBlock Text="&#xE1D6;" FontFamily="Segoe UI Symbol" FontSize="24"
+                                       Foreground="White" Margin="0,0,0,8"/>
+                            <TextBlock Text="Microphone" FontSize="13" Foreground="White"/>
+                            <TextBlock Text="{Binding MicrophoneAppText}" FontSize="11" 
+                                       Foreground="White" Opacity="0.7"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+                <UniformGrid Columns="3" Margin="0,0,0,30">
+                    <!-- Files -->
+                    <Border Background="#FF2196F3" Margin="0,0,4,0" Padding="15,18">
+                        <StackPanel>
+                            <TextBlock Text="&#xE188;" FontFamily="Segoe UI Symbol" FontSize="24"
+                                       Foreground="White" Margin="0,0,0,8"/>
+                            <TextBlock Text="Files" FontSize="13" Foreground="White"/>
+                            <TextBlock Text="{Binding FileSystemAppText}" FontSize="11" 
+                                       Foreground="White" Opacity="0.7"/>
+                        </StackPanel>
+                    </Border>
+                    <!-- Network -->
+                    <Border Background="#FF9C27B0" Margin="0,0,4,0" Padding="15,18">
+                        <StackPanel>
+                            <TextBlock Text="&#xE12B;" FontFamily="Segoe UI Symbol" FontSize="24"
+                                       Foreground="White" Margin="0,0,0,8"/>
+                            <TextBlock Text="Network" FontSize="13" Foreground="White"/>
+                            <TextBlock Text="{Binding NetworkAppText}" FontSize="11" 
+                                       Foreground="White" Opacity="0.7"/>
+                        </StackPanel>
+                    </Border>
+                    <!-- IPC -->
+                    <Border Background="#FF00BCD4" Padding="15,18">
+                        <StackPanel>
+                            <TextBlock Text="&#xE134;" FontFamily="Segoe UI Symbol" FontSize="24"
+                                       Foreground="White" Margin="0,0,0,8"/>
+                            <TextBlock Text="IPC" FontSize="13" Foreground="White"/>
+                            <TextBlock Text="{Binding IpcAppText}" FontSize="11" 
+                                       Foreground="White" Opacity="0.7"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+            </StackPanel>
 
-                <!-- Camera Card -->
-                <Border Background="{DynamicResource MetroSeparatorBrush}" 
-                        Margin="0,0,10,10" Padding="15" CornerRadius="4">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,10">
-                            <Ellipse Width="40" Height="40" Fill="#FF4CAF50" Opacity="0.2"/>
-                            <TextBlock Text="&#xE114;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="#FF4CAF50"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <TextBlock Text="Camera" FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="1 app" FontSize="12" Opacity="0.6"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
-
-                <!-- Microphone Card -->
-                <Border Background="{DynamicResource MetroSeparatorBrush}" 
-                        Margin="0,0,0,10" Padding="15" CornerRadius="4">
-                    <StackPanel>
-                        <Grid Margin="0,0,0,10">
-                            <Ellipse Width="40" Height="40" Fill="#FFFF9800" Opacity="0.2"/>
-                            <TextBlock Text="&#xE1D6;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="#FFFF9800"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <TextBlock Text="Microphone" FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"
-                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="0 apps" FontSize="12" Opacity="0.6"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"
-                                   HorizontalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
-            </UniformGrid>
-
-            <!-- Permission Manager -->
+            <!-- Global Permission Policies -->
             <TextBlock Text="Permission manager" FontSize="18" FontWeight="Light"
-                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,10,0,15"/>
+                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,0,0,5"/>
 
-            <TextBlock Text="Control app access to your device's features."
+            <TextBlock Text="Global policies — disabling a permission revokes it from all running apps."
                        FontSize="13" Foreground="{DynamicResource MetroForegroundBrush}"
                        Opacity="0.8" Margin="0,0,0,15"/>
 
-            <!-- Permission Items (Android 16 style) -->
             <StackPanel>
-                <!-- Location Permission -->
-                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,15">
+                <!-- Location -->
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <Grid>
-                            <Ellipse Width="40" Height="40" Fill="{DynamicResource MetroAccentBrush}" Opacity="0.15"/>
-                            <TextBlock Text="&#xE1D1;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="{DynamicResource MetroAccentBrush}"
+                        <Border Width="40" Height="40" Background="{DynamicResource MetroAccentBrush}">
+                            <TextBlock Text="&#xE1D1;" FontFamily="Segoe UI Symbol" FontSize="20"
+                                       Foreground="White"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                            <TextBlock Text="Location" FontSize="14" FontWeight="SemiBold"
+                            <TextBlock Text="Location" FontSize="14"
                                        Foreground="{DynamicResource MetroForegroundBrush}"/>
-                            <TextBlock Text="Allow apps to access your location" FontSize="12"
+                            <TextBlock Text="Allow apps to access your location" FontSize="11"
                                        Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
                         </StackPanel>
-
                         <ToggleButton Grid.Column="2" Style="{StaticResource MetroToggleSwitchStyle}"
                                       IsChecked="{Binding AllowLocation, Mode=TwoWay}"/>
                     </Grid>
                 </Border>
 
-                <!-- Camera Permission -->
-                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,15">
+                <!-- Camera -->
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <Grid>
-                            <Ellipse Width="40" Height="40" Fill="#FF4CAF50" Opacity="0.15"/>
-                            <TextBlock Text="&#xE114;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="#FF4CAF50"
+                        <Border Width="40" Height="40" Background="#FF4CAF50">
+                            <TextBlock Text="&#xE114;" FontFamily="Segoe UI Symbol" FontSize="20"
+                                       Foreground="White"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                            <TextBlock Text="Camera" FontSize="14" FontWeight="SemiBold"
+                            <TextBlock Text="Camera" FontSize="14"
                                        Foreground="{DynamicResource MetroForegroundBrush}"/>
-                            <TextBlock Text="Allow apps to take photos and videos" FontSize="12"
+                            <TextBlock Text="Allow apps to take photos and videos" FontSize="11"
                                        Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
                         </StackPanel>
-
                         <ToggleButton Grid.Column="2" Style="{StaticResource MetroToggleSwitchStyle}"
                                       IsChecked="{Binding AllowCamera, Mode=TwoWay}"/>
                     </Grid>
                 </Border>
 
-                <!-- Microphone Permission -->
-                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,15">
+                <!-- Microphone -->
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <Grid>
-                            <Ellipse Width="40" Height="40" Fill="#FFFF9800" Opacity="0.15"/>
-                            <TextBlock Text="&#xE1D6;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="#FFFF9800"
+                        <Border Width="40" Height="40" Background="#FFFF9800">
+                            <TextBlock Text="&#xE1D6;" FontFamily="Segoe UI Symbol" FontSize="20"
+                                       Foreground="White"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                            <TextBlock Text="Microphone" FontSize="14" FontWeight="SemiBold"
+                            <TextBlock Text="Microphone" FontSize="14"
                                        Foreground="{DynamicResource MetroForegroundBrush}"/>
-                            <TextBlock Text="Allow apps to record audio" FontSize="12"
+                            <TextBlock Text="Allow apps to record audio" FontSize="11"
                                        Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
                         </StackPanel>
-
                         <ToggleButton Grid.Column="2" Style="{StaticResource MetroToggleSwitchStyle}"
                                       IsChecked="{Binding AllowMicrophone, Mode=TwoWay}"/>
                     </Grid>
                 </Border>
 
-                <!-- File System Permission -->
-                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,15">
+                <!-- Files -->
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <Grid>
-                            <Ellipse Width="40" Height="40" Fill="#FF2196F3" Opacity="0.15"/>
-                            <TextBlock Text="&#xE188;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="#FF2196F3"
+                        <Border Width="40" Height="40" Background="#FF2196F3">
+                            <TextBlock Text="&#xE188;" FontFamily="Segoe UI Symbol" FontSize="20"
+                                       Foreground="White"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                            <TextBlock Text="Files and storage" FontSize="14" FontWeight="SemiBold"
+                            <TextBlock Text="Files and storage" FontSize="14"
                                        Foreground="{DynamicResource MetroForegroundBrush}"/>
-                            <TextBlock Text="Allow apps to read and write files" FontSize="12"
+                            <TextBlock Text="Allow apps to read and write files" FontSize="11"
                                        Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
                         </StackPanel>
-
                         <ToggleButton Grid.Column="2" Style="{StaticResource MetroToggleSwitchStyle}"
                                       IsChecked="{Binding AllowFileSystem, Mode=TwoWay}"/>
                     </Grid>
                 </Border>
 
-                <!-- Network Permission -->
-                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,15">
+                <!-- Network -->
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <Grid>
-                            <Ellipse Width="40" Height="40" Fill="#FF9C27B0" Opacity="0.15"/>
-                            <TextBlock Text="&#xE12B;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="#FF9C27B0"
+                        <Border Width="40" Height="40" Background="#FF9C27B0">
+                            <TextBlock Text="&#xE12B;" FontFamily="Segoe UI Symbol" FontSize="20"
+                                       Foreground="White"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                            <TextBlock Text="Network access" FontSize="14" FontWeight="SemiBold"
+                            <TextBlock Text="Network access" FontSize="14"
                                        Foreground="{DynamicResource MetroForegroundBrush}"/>
-                            <TextBlock Text="Allow apps to connect to the internet" FontSize="12"
+                            <TextBlock Text="Allow apps to connect to the internet" FontSize="11"
                                        Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
                         </StackPanel>
-
                         <ToggleButton Grid.Column="2" Style="{StaticResource MetroToggleSwitchStyle}"
                                       IsChecked="{Binding AllowNetwork, Mode=TwoWay}"/>
                     </Grid>
                 </Border>
 
-                <!-- IPC Permission -->
-                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,15">
+                <!-- IPC -->
+                <Border BorderBrush="{DynamicResource MetroSeparatorBrush}" BorderThickness="0,0,0,1" Padding="0,12">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="50"/>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-
-                        <Grid>
-                            <Ellipse Width="40" Height="40" Fill="#FF00BCD4" Opacity="0.15"/>
-                            <TextBlock Text="&#xE134;" FontFamily="Segoe UI Symbol" FontSize="18"
-                                       Foreground="#FF00BCD4"
+                        <Border Width="40" Height="40" Background="#FF00BCD4">
+                            <TextBlock Text="&#xE134;" FontFamily="Segoe UI Symbol" FontSize="20"
+                                       Foreground="White"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-
+                        </Border>
                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                            <TextBlock Text="Inter-app communication" FontSize="14" FontWeight="SemiBold"
+                            <TextBlock Text="Inter-app communication" FontSize="14"
                                        Foreground="{DynamicResource MetroForegroundBrush}"/>
-                            <TextBlock Text="Allow apps to communicate with each other" FontSize="12"
+                            <TextBlock Text="Allow apps to communicate with each other" FontSize="11"
                                        Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
                         </StackPanel>
-
                         <ToggleButton Grid.Column="2" Style="{StaticResource MetroToggleSwitchStyle}"
                                       IsChecked="{Binding AllowIpc, Mode=TwoWay}"/>
                     </Grid>
                 </Border>
             </StackPanel>
-
-            <!-- Additional Privacy Settings -->
-            <TextBlock Text="Additional settings" FontSize="18" FontWeight="Light"
-                       Foreground="{DynamicResource MetroAccentBrush}" Margin="0,30,0,15"/>
-
-            <Border Background="{DynamicResource MetroSeparatorBrush}" 
-                    Padding="15" CornerRadius="4" Margin="0,0,0,10" Cursor="Hand">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="Permission history" FontSize="14"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"/>
-                        <TextBlock Text="View a timeline of permission usage" FontSize="12"
-                                   Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="1" Text="&#xE0AD;" FontFamily="Segoe UI Symbol"
-                               FontSize="16" Foreground="{DynamicResource MetroForegroundBrush}"
-                               VerticalAlignment="Center" Opacity="0.5"/>
-                </Grid>
-            </Border>
-
-            <Border Background="{DynamicResource MetroSeparatorBrush}" 
-                    Padding="15" CornerRadius="4" Cursor="Hand">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="App permissions" FontSize="14"
-                                   Foreground="{DynamicResource MetroForegroundBrush}"/>
-                        <TextBlock Text="Manage permissions for individual apps" FontSize="12"
-                                   Foreground="{DynamicResource MetroForegroundBrush}" Opacity="0.6"/>
-                    </StackPanel>
-                    <TextBlock Grid.Column="1" Text="&#xE0AD;" FontFamily="Segoe UI Symbol"
-                               FontSize="16" Foreground="{DynamicResource MetroForegroundBrush}"
-                               VerticalAlignment="Center" Opacity="0.5"/>
-                </Grid>
-            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

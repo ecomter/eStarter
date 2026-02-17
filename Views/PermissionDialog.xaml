@@ -10,13 +10,17 @@
         WindowStartupLocation="CenterOwner"
         Width="420" Height="280">
 
-    <Border Background="#FF1F1F1F" 
+    <Border x:Name="DialogBorder" Background="#FF1F1F1F" 
             BorderThickness="0"
-            Margin="20">
+            Margin="20"
+            RenderTransformOrigin="0.5,0.5">
+        <Border.RenderTransform>
+            <ScaleTransform x:Name="DialogScale" ScaleX="0.92" ScaleY="0.92"/>
+        </Border.RenderTransform>
         <Border.Effect>
             <DropShadowEffect ShadowDepth="0" BlurRadius="20" Opacity="0.5"/>
         </Border.Effect>
-        
+
         <Grid Margin="24">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -146,4 +150,32 @@
             </Grid>
         </Grid>
     </Border>
+    <Window.Triggers>
+        <EventTrigger RoutedEvent="Loaded">
+            <BeginStoryboard>
+                <Storyboard>
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                    From="0" To="1" Duration="0:0:0.22">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation Storyboard.TargetName="DialogScale"
+                                    Storyboard.TargetProperty="ScaleX"
+                                    To="1" Duration="0:0:0.25">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                    <DoubleAnimation Storyboard.TargetName="DialogScale"
+                                    Storyboard.TargetProperty="ScaleY"
+                                    To="1" Duration="0:0:0.25">
+                        <DoubleAnimation.EasingFunction>
+                            <CubicEase EasingMode="EaseOut"/>
+                        </DoubleAnimation.EasingFunction>
+                    </DoubleAnimation>
+                </Storyboard>
+            </BeginStoryboard>
+        </EventTrigger>
+    </Window.Triggers>
 </Window>

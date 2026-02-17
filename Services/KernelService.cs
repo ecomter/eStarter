@@ -48,6 +48,7 @@ namespace eStarter.Services
         public SystemBus SystemBus => _systemBus;
         public VirtualFileSystem FileSystem => _kernel.FileSystem;
         public PermissionManager Permissions => _kernel.Permissions;
+        public SystemSettingsManager SystemSettings => _kernel.SystemSettings;
         public NotificationService Notifications => _notificationService ?? throw new InvalidOperationException("Not initialized");
 
         public bool IsRunning { get; private set; }

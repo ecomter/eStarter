@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using eStarter.Services;
 
 namespace eStarter.Views.Settings
 {
@@ -15,7 +16,7 @@ namespace eStarter.Views.Settings
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
             var result = ModernMsgBox.ShowMessage(
-                "This will remove all app data and settings. Are you sure?",
+                "This will terminate all running processes and remove all app data and settings. Are you sure?",
                 "Reset App Data",
                 MessageBoxButton.YesNo,
                 Window.GetWindow(this));
@@ -24,6 +25,17 @@ namespace eStarter.Views.Settings
             {
                 try
                 {
+                    // Terminate all running processes through the kernel
+                    if (KernelService.Instance.IsRunning)
+                    {
+                        var processes = KernelService.Instance.Kernel.GetAllProcesses();
+                        foreach (var process in processes)
+                        {
+                            KernelService.Instance.Kernel.UnregisterProcess(process.AppId);
+                        }
+                        System.Diagnostics.Debug.WriteLine($"[UpdatePanel] Terminated {processes.Length} processes via kernel");
+                    }
+
                     var baseDir = Path.Combine(
                         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                         "eStarter");

@@ -5,6 +5,39 @@
              xmlns:settings="clr-namespace:eStarter.Views.Settings"
              FontFamily="Microsoft YaHei, Segoe UI">
 
+    <UserControl.Resources>
+        <!-- Win8-style content entrance: fade + slide up -->
+        <Style x:Key="PanelEntranceStyle" TargetType="UserControl">
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <TranslateTransform Y="0"/>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Visibility" Value="Visible">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                From="0" To="1" Duration="0:0:0.25">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                                From="30" To="0" Duration="0:0:0.3">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <UserControl.DataContext>
         <local:SettingsViewModel/>
     </UserControl.DataContext>
@@ -89,41 +122,49 @@
         <Grid Grid.Column="1" Margin="40,50,40,40">
             <!-- Personalize Panel -->
             <settings:PersonalizePanel x:Name="PersonalizePanel" 
+                                        Style="{StaticResource PanelEntranceStyle}"
                                         DataContext="{Binding}"
                                         Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=Personalize}"/>
 
             <!-- Users Panel -->
             <settings:UsersPanel x:Name="UsersPanel"
+                                  Style="{StaticResource PanelEntranceStyle}"
                                   DataContext="{Binding}"
                                   Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=Users}"/>
 
             <!-- Notifications Panel -->
             <settings:NotificationsPanel x:Name="NotificationsPanel"
+                                          Style="{StaticResource PanelEntranceStyle}"
                                           DataContext="{Binding}"
                                           Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=Notifications}"/>
 
             <!-- Apps Panel -->
             <settings:AppsPanel x:Name="AppsPanel"
+                                 Style="{StaticResource PanelEntranceStyle}"
                                  DataContext="{Binding}"
                                  Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=Apps}"/>
 
             <!-- Privacy Panel -->
             <settings:PrivacyPanel x:Name="PrivacyPanel"
+                                    Style="{StaticResource PanelEntranceStyle}"
                                     DataContext="{Binding}"
                                     Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=Privacy}"/>
 
             <!-- Time and Language Panel -->
             <settings:TimeLanguagePanel x:Name="TimeLanguagePanel"
+                                         Style="{StaticResource PanelEntranceStyle}"
                                          DataContext="{Binding}"
                                          Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=TimeLanguage}"/>
 
             <!-- Update Panel -->
             <settings:UpdatePanel x:Name="UpdatePanel"
+                                   Style="{StaticResource PanelEntranceStyle}"
                                    DataContext="{Binding}"
                                    Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=Update}"/>
 
             <!-- About Panel -->
             <settings:AboutPanel x:Name="AboutPanel"
+                                  Style="{StaticResource PanelEntranceStyle}"
                                   DataContext="{Binding}"
                                   Visibility="{Binding SelectedCategory.Id, Converter={StaticResource CategoryToVisibilityConverter}, ConverterParameter=About}"/>
 

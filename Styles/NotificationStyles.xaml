@@ -120,12 +120,16 @@
                         <Storyboard>
                             <DoubleAnimation Storyboard.TargetName="ToastBorder"
                                            Storyboard.TargetProperty="Opacity"
-                                           To="0" Duration="0:0:0.3"/>
-                            <DoubleAnimation Storyboard.TargetName="ToastBorder"
-                                           Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
-                                           To="400" Duration="0:0:0.3">
+                                           To="0" Duration="0:0:0.2">
                                 <DoubleAnimation.EasingFunction>
                                     <CubicEase EasingMode="EaseIn"/>
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                            <DoubleAnimation Storyboard.TargetName="ToastBorder"
+                                           Storyboard.TargetProperty="(RenderTransform).(TranslateTransform.X)"
+                                           To="380" Duration="0:0:0.25">
+                                <DoubleAnimation.EasingFunction>
+                                    <ExponentialEase EasingMode="EaseIn" Exponent="4"/>
                                 </DoubleAnimation.EasingFunction>
                             </DoubleAnimation>
                         </Storyboard>

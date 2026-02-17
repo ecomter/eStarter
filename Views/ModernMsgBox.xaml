@@ -10,7 +10,7 @@
         FontFamily="Microsoft YaHei, Segoe UI">
     <Grid Margin="20" RenderTransformOrigin="0.5,0.5">
         <Grid.RenderTransform>
-            <ScaleTransform x:Name="WindowScale" ScaleX="0.9" ScaleY="0.9"/>
+            <ScaleTransform x:Name="WindowScale" ScaleX="0.92" ScaleY="0.92"/>
         </Grid.RenderTransform>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -71,19 +71,19 @@
         <EventTrigger RoutedEvent="Loaded">
             <BeginStoryboard>
                 <Storyboard>
-                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.2">
+                    <DoubleAnimation Storyboard.TargetProperty="Opacity" From="0" To="1" Duration="0:0:0.22">
                         <DoubleAnimation.EasingFunction>
-                            <ExponentialEase EasingMode="EaseOut"/>
+                            <CubicEase EasingMode="EaseOut"/>
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
-                    <DoubleAnimation Storyboard.TargetName="WindowScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.2">
+                    <DoubleAnimation Storyboard.TargetName="WindowScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.25">
                         <DoubleAnimation.EasingFunction>
-                            <ExponentialEase EasingMode="EaseOut"/>
+                            <CubicEase EasingMode="EaseOut"/>
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
-                    <DoubleAnimation Storyboard.TargetName="WindowScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.2">
+                    <DoubleAnimation Storyboard.TargetName="WindowScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.25">
                         <DoubleAnimation.EasingFunction>
-                            <ExponentialEase EasingMode="EaseOut"/>
+                            <CubicEase EasingMode="EaseOut"/>
                         </DoubleAnimation.EasingFunction>
                     </DoubleAnimation>
                 </Storyboard>

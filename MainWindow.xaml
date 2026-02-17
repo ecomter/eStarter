@@ -159,7 +159,11 @@
                          VerticalScrollBarVisibility="Auto"
                          Background="{DynamicResource MetroBackgroundBrush}"
                          Padding="30,20,30,30">
-                <ItemsControl ItemsSource="{Binding InstalledApps}">
+                <ItemsControl x:Name="TilesItemsControl" ItemsSource="{Binding InstalledApps}"
+                              AllowDrop="True"
+                              DragOver="TileArea_DragOver"
+                              Drop="TileArea_Drop"
+                              GiveFeedback="TileArea_GiveFeedback">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <WrapPanel Orientation="Horizontal"/>
@@ -168,9 +172,13 @@
 
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type models:AppEntry}">
-                            <ContentControl Loaded="Tile_Loaded" Opacity="0">
+                            <ContentControl Loaded="Tile_Loaded" Opacity="0"
+                                            PreviewMouseLeftButtonDown="Tile_PreviewMouseLeftButtonDown"
+                                            PreviewMouseMove="Tile_PreviewMouseMove"
+                                            ContextMenuOpening="Tile_ContextMenuOpening"
+                                            ContextMenu="{x:Null}">
                                 <ContentControl.RenderTransform>
-                                    <TranslateTransform X="400" Y="0"/>
+                                    <TranslateTransform X="120" Y="0"/>
                                 </ContentControl.RenderTransform>
                                 
                                 <Button Style="{StaticResource MetroTileStyle}" 
@@ -220,9 +228,9 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
-                                                       To="0" Duration="0:0:0.3">
+                                                       To="0" Duration="0:0:0.25">
                                             <DoubleAnimation.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseOut"/>
+                                                <CubicEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -232,9 +240,9 @@
                                 <BeginStoryboard>
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)" 
-                                                       To="350" Duration="0:0:0.3">
+                                                       To="350" Duration="0:0:0.2">
                                             <DoubleAnimation.EasingFunction>
-                                                <ExponentialEase EasingMode="EaseIn"/>
+                                                <CubicEase EasingMode="EaseIn"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>

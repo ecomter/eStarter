@@ -30,6 +30,7 @@ namespace eStarter.ViewModels
         public ICommand LaunchCommand { get; }
         public ICommand ChangeTileSizeCommand { get; }
         public ICommand ChangeTileColorCommand { get; }
+        public ICommand ResizeTileCommand { get; }
         public ICommand ChangeThemeCommand { get; }
         public ICommand ChangeAccentColorCommand { get; }
         public ICommand CloseSearchCommand { get; }
@@ -196,6 +197,11 @@ namespace eStarter.ViewModels
             LaunchCommand = new RelayCommand(param => LaunchApp(param as AppEntry));
             ChangeTileSizeCommand = new RelayCommand(async param => await ChangeTileSizeAsync(param as AppEntry));
             ChangeTileColorCommand = new RelayCommand(async param => await ChangeTileColorAsync(param as AppEntry));
+            ResizeTileCommand = new RelayCommand(async param =>
+            {
+                if (param is object[] args && args.Length == 2 && args[0] is AppEntry app && args[1] is TileSize size)
+                    await ResizeTileToAsync(app, size);
+            });
             ChangeThemeCommand = new RelayCommand(async param => await ChangeThemeAsync(param as string));
             ChangeAccentColorCommand = new RelayCommand(async param => await ChangeAccentColorSettingAsync(param as string));
             CloseSearchCommand = new RelayCommand(_ => IsSearchOpen = false);
@@ -704,6 +710,22 @@ namespace eStarter.ViewModels
             await SaveSettingsAsync();
         }
 
+        private async Task ResizeTileToAsync(AppEntry app, TileSize size)
+        {
+            app.TileSize = size;
+            await SaveSettingsAsync();
+        }
+
+        public async void MoveApp(int oldIndex, int newIndex)
+        {
+            if (oldIndex < 0 || oldIndex >= InstalledApps.Count) return;
+            if (newIndex < 0 || newIndex >= InstalledApps.Count) return;
+            if (oldIndex == newIndex) return;
+
+            InstalledApps.Move(oldIndex, newIndex);
+            await SaveSettingsAsync();
+        }
+
         private async Task ChangeTileColorAsync(AppEntry? app)
         {
             if (app == null) return;
@@ -725,6 +747,11 @@ namespace eStarter.ViewModels
         private async Task SaveSettingsAsync()
         {
             await _settingsService.SaveTileConfigurationAsync(InstalledApps);
+        }
+
+        public async void SaveTileOrderAsync()
+        {
+            await SaveSettingsAsync();
         }
 
         private async Task TestConnectionAsync()

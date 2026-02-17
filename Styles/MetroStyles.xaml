@@ -55,9 +55,9 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="ThumbTransform"
                                                         Storyboard.TargetProperty="X"
-                                                        To="36" Duration="0:0:0.15">
+                                                        To="36" Duration="0:0:0.2">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="5"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -68,9 +68,9 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="ThumbTransform"
                                                         Storyboard.TargetProperty="X"
-                                                        To="0" Duration="0:0:0.15">
+                                                        To="0" Duration="0:0:0.2">
                                             <DoubleAnimation.EasingFunction>
-                                                <CubicEase EasingMode="EaseOut"/>
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="5"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -78,7 +78,24 @@
                             </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Track" Property="Opacity" Value="0.9"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Track" 
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="0.85" Duration="0:0:0.15"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Track" 
+                                                        Storyboard.TargetProperty="Opacity"
+                                                        To="1" Duration="0:0:0.15"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -136,19 +153,19 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="CheckMark"
                                                         Storyboard.TargetProperty="Opacity"
-                                                        To="1" Duration="0:0:0.1"/>
+                                                        To="1" Duration="0:0:0.12"/>
                                         <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
                                                         Storyboard.TargetProperty="ScaleX"
-                                                        To="1" Duration="0:0:0.15">
+                                                        To="1" Duration="0:0:0.2">
                                             <DoubleAnimation.EasingFunction>
-                                                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                                <CubicEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
                                                         Storyboard.TargetProperty="ScaleY"
-                                                        To="1" Duration="0:0:0.15">
+                                                        To="1" Duration="0:0:0.2">
                                             <DoubleAnimation.EasingFunction>
-                                                <BackEase EasingMode="EaseOut" Amplitude="0.3"/>
+                                                <CubicEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -159,13 +176,21 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="CheckMark"
                                                         Storyboard.TargetProperty="Opacity"
-                                                        To="0" Duration="0:0:0.1"/>
+                                                        To="0" Duration="0:0:0.12"/>
                                         <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
                                                         Storyboard.TargetProperty="ScaleX"
-                                                        To="0" Duration="0:0:0.1"/>
+                                                        To="0" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="CheckMarkScale"
                                                         Storyboard.TargetProperty="ScaleY"
-                                                        To="0" Duration="0:0:0.1"/>
+                                                        To="0" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -223,19 +248,19 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="RadioDot"
                                                         Storyboard.TargetProperty="Opacity"
-                                                        To="1" Duration="0:0:0.1"/>
+                                                        To="1" Duration="0:0:0.12"/>
                                         <DoubleAnimation Storyboard.TargetName="RadioDotScale"
                                                         Storyboard.TargetProperty="ScaleX"
                                                         To="1" Duration="0:0:0.2">
                                             <DoubleAnimation.EasingFunction>
-                                                <BackEase EasingMode="EaseOut" Amplitude="0.4"/>
+                                                <CubicEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="RadioDotScale"
                                                         Storyboard.TargetProperty="ScaleY"
                                                         To="1" Duration="0:0:0.2">
                                             <DoubleAnimation.EasingFunction>
-                                                <BackEase EasingMode="EaseOut" Amplitude="0.4"/>
+                                                <CubicEase EasingMode="EaseOut"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -246,13 +271,21 @@
                                     <Storyboard>
                                         <DoubleAnimation Storyboard.TargetName="RadioDot"
                                                         Storyboard.TargetProperty="Opacity"
-                                                        To="0" Duration="0:0:0.1"/>
+                                                        To="0" Duration="0:0:0.12"/>
                                         <DoubleAnimation Storyboard.TargetName="RadioDotScale"
                                                         Storyboard.TargetProperty="ScaleX"
-                                                        To="0" Duration="0:0:0.1"/>
+                                                        To="0" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="RadioDotScale"
                                                         Storyboard.TargetProperty="ScaleY"
-                                                        To="0" Duration="0:0:0.1"/>
+                                                        To="0" Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseIn"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -336,19 +369,18 @@
                             <Trigger.EnterActions>
                                 <BeginStoryboard>
                                     <Storyboard>
-                                        <!-- Simulate 3D Flip/Tilt using non-uniform scale and skew -->
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleX" 
-                                                       To="0.7" 
-                                                       Duration="0:0:0.1"/>
+                                                       To="0.85" 
+                                                       Duration="0:0:0.08"/>
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleY" 
-                                                       To="0.9" 
-                                                       Duration="0:0:0.1"/>
+                                                       To="0.85" 
+                                                       Duration="0:0:0.08"/>
                                         <DoubleAnimation Storyboard.TargetName="SkewTransform" 
                                                        Storyboard.TargetProperty="AngleY" 
-                                                       To="-5" 
-                                                       Duration="0:0:0.1"/>
+                                                       To="-3" 
+                                                       Duration="0:0:0.08"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -358,25 +390,25 @@
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleX" 
                                                        To="1.0" 
-                                                       Duration="0:0:0.3">
+                                                       Duration="0:0:0.25">
                                             <DoubleAnimation.EasingFunction>
-                                                <ElasticEase Oscillations="1" Springiness="6"/>
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="4"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleY" 
                                                        To="1.0" 
-                                                       Duration="0:0:0.3">
+                                                       Duration="0:0:0.25">
                                             <DoubleAnimation.EasingFunction>
-                                                <ElasticEase Oscillations="1" Springiness="6"/>
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="4"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="SkewTransform" 
                                                        Storyboard.TargetProperty="AngleY" 
                                                        To="0" 
-                                                       Duration="0:0:0.3">
+                                                       Duration="0:0:0.25">
                                             <DoubleAnimation.EasingFunction>
-                                                <ElasticEase Oscillations="1" Springiness="6"/>
+                                                <ExponentialEase EasingMode="EaseOut" Exponent="4"/>
                                             </DoubleAnimation.EasingFunction>
                                         </DoubleAnimation>
                                     </Storyboard>
@@ -471,21 +503,9 @@
                                       VerticalAlignment="Center"/>
                         </Border>
 
-                        <!-- Context Menu -->
-                        <Grid.ContextMenu>
-                            <ContextMenu Background="#FF2D2D30" BorderBrush="#FF3F3F46">
-                                <MenuItem Header="Resize" 
-                                         Command="{Binding DataContext.ChangeTileSizeCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                         CommandParameter="{Binding}"
-                                         Foreground="White"
-                                         Background="#FF2D2D30"/>
-                                <MenuItem Header="Change color" 
-                                         Command="{Binding DataContext.ChangeTileColorCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
-                                         CommandParameter="{Binding}"
-                                         Foreground="White"
-                                         Background="#FF2D2D30"/>
-                            </ContextMenu>
-                        </Grid.ContextMenu>
+                        <!-- Context Menu is built programmatically in MainWindow.xaml.cs
+                             because ContextMenu has a separate visual tree and cannot
+                             resolve RelativeSource AncestorType=Window for commands. -->
                     </Grid>
 
                     <ControlTemplate.Triggers>
@@ -496,7 +516,23 @@
                                         <DoubleAnimation Storyboard.TargetName="HoverOverlay" 
                                                        Storyboard.TargetProperty="Opacity" 
                                                        To="0.08" 
-                                                       Duration="0:0:0.1"/>
+                                                       Duration="0:0:0.15"/>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
+                                                       Storyboard.TargetProperty="ScaleX" 
+                                                       To="1.02" 
+                                                       Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
+                                                       Storyboard.TargetProperty="ScaleY" 
+                                                       To="1.02" 
+                                                       Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -506,7 +542,23 @@
                                         <DoubleAnimation Storyboard.TargetName="HoverOverlay" 
                                                        Storyboard.TargetProperty="Opacity" 
                                                        To="0" 
-                                                       Duration="0:0:0.1"/>
+                                                       Duration="0:0:0.15"/>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
+                                                       Storyboard.TargetProperty="ScaleX" 
+                                                       To="1.0" 
+                                                       Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
+                                                       Storyboard.TargetProperty="ScaleY" 
+                                                       To="1.0" 
+                                                       Duration="0:0:0.2">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -522,12 +574,12 @@
                                                        Duration="0:0:0"/>
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleX" 
-                                                       To="0.98" 
-                                                       Duration="0:0:0.05"/>
+                                                       To="0.96" 
+                                                       Duration="0:0:0.06"/>
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleY" 
-                                                       To="0.98" 
-                                                       Duration="0:0:0.05"/>
+                                                       To="0.96" 
+                                                       Duration="0:0:0.06"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>
@@ -537,15 +589,23 @@
                                         <DoubleAnimation Storyboard.TargetName="PressOverlay" 
                                                        Storyboard.TargetProperty="Opacity" 
                                                        To="0" 
-                                                       Duration="0:0:0.1"/>
+                                                       Duration="0:0:0.15"/>
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleX" 
                                                        To="1.0" 
-                                                       Duration="0:0:0.1"/>
+                                                       Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                         <DoubleAnimation Storyboard.TargetName="ScaleTransform" 
                                                        Storyboard.TargetProperty="ScaleY" 
                                                        To="1.0" 
-                                                       Duration="0:0:0.1"/>
+                                                       Duration="0:0:0.25">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut"/>
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.ExitActions>
@@ -569,14 +629,34 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
-                    <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                    <Border x:Name="ItemBorder" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="{DynamicResource MetroForegroundBrush}"/>
-                            <Setter Property="Opacity" Value="1.0"/>
-                            <Setter Property="Background" Value="#19888888"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                        To="1.0" Duration="0:0:0.15"/>
+                                        <ColorAnimation Storyboard.TargetName="ItemBorder"
+                                                       Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                       To="#19888888" Duration="0:0:0.15"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                        To="0.8" Duration="0:0:0.15"/>
+                                        <ColorAnimation Storyboard.TargetName="ItemBorder"
+                                                       Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"
+                                                       To="Transparent" Duration="0:0:0.15"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter Property="Background" Value="{DynamicResource MetroAccentBrush}"/>

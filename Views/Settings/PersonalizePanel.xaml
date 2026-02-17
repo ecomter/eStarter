@@ -91,7 +91,7 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Width="40" Height="40" Margin="0,0,8,8"
+                        <Button Width="40" Height="40" Margin="0,0,3,8"
                                 Command="{Binding DataContext.ChangeAccentColorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding}"
                                 Cursor="Hand">

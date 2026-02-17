@@ -37,6 +37,9 @@ namespace eStarter.ViewModels
 
     /// <summary>
     /// ViewModel for the Settings page.
+    /// Settings acts as a system-level app with elevated privileges:
+    /// privacy toggles directly control kernel permission policies,
+    /// theme/language changes propagate through the kernel SystemSettingsManager.
     /// </summary>
     public class SettingsViewModel : INotifyPropertyChanged
     {
@@ -150,7 +153,13 @@ namespace eStarter.ViewModels
         public bool ShowNotifications
         {
             get => Settings.ShowNotifications;
-            set { Settings.ShowNotifications = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.ShowNotifications = value;
+                SyncNotificationPolicy();
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool ShowTime
@@ -165,60 +174,115 @@ namespace eStarter.ViewModels
             set { Settings.EnableAnimations = value; OnPropertyChanged(); SaveSettings(); }
         }
 
-        // Notification settings
+        // Notification settings — synced to kernel notification policy
         public bool ShowLockScreenNotifications
         {
             get => Settings.ShowLockScreenNotifications;
-            set { Settings.ShowLockScreenNotifications = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.ShowLockScreenNotifications = value;
+                SyncNotificationPolicy();
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool PlayNotificationSounds
         {
             get => Settings.PlayNotificationSounds;
-            set { Settings.PlayNotificationSounds = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.PlayNotificationSounds = value;
+                SyncNotificationPolicy();
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool QuietHoursEnabled
         {
             get => Settings.QuietHoursEnabled;
-            set { Settings.QuietHoursEnabled = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.QuietHoursEnabled = value;
+                SyncNotificationPolicy();
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
-        // Privacy settings
+        // Privacy settings — these directly control kernel global permission policies.
+        // When toggled off, the kernel revokes the permission from ALL running processes.
         public bool AllowLocation
         {
             get => Settings.AllowLocation;
-            set { Settings.AllowLocation = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.AllowLocation = value;
+                ApplyGlobalPermissionPolicy(Permission.Location, value);
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool AllowCamera
         {
             get => Settings.AllowCamera;
-            set { Settings.AllowCamera = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.AllowCamera = value;
+                ApplyGlobalPermissionPolicy(Permission.Camera, value);
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool AllowMicrophone
         {
             get => Settings.AllowMicrophone;
-            set { Settings.AllowMicrophone = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.AllowMicrophone = value;
+                ApplyGlobalPermissionPolicy(Permission.Microphone, value);
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool AllowFileSystem
         {
             get => Settings.AllowFileSystem;
-            set { Settings.AllowFileSystem = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.AllowFileSystem = value;
+                ApplyGlobalPermissionPolicy(Permission.FileSystem, value);
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool AllowNetwork
         {
             get => Settings.AllowNetwork;
-            set { Settings.AllowNetwork = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.AllowNetwork = value;
+                ApplyGlobalPermissionPolicy(Permission.Network, value);
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         public bool AllowIpc
         {
             get => Settings.AllowIpc;
-            set { Settings.AllowIpc = value; OnPropertyChanged(); SaveSettings(); }
+            set
+            {
+                Settings.AllowIpc = value;
+                ApplyGlobalPermissionPolicy(Permission.Ipc, value);
+                OnPropertyChanged();
+                SaveSettings();
+            }
         }
 
         // Time settings
@@ -412,6 +476,9 @@ namespace eStarter.ViewModels
             Settings = await _settingsService.LoadAppSettingsAsync();
             UserPicturePath = Settings.UserPicturePath;
 
+            // Sync settings from kernel policies (kernel is the source of truth)
+            SyncFromKernelPolicies();
+
             // Apply theme on load
             ApplyTheme();
             ApplyAccentColor();
@@ -421,9 +488,49 @@ namespace eStarter.ViewModels
             OnPropertyChanged(nameof(ShowNotifications));
             OnPropertyChanged(nameof(ShowTime));
             OnPropertyChanged(nameof(EnableAnimations));
+            OnPropertyChanged(nameof(ShowLockScreenNotifications));
+            OnPropertyChanged(nameof(PlayNotificationSounds));
+            OnPropertyChanged(nameof(QuietHoursEnabled));
+            OnPropertyChanged(nameof(AllowLocation));
+            OnPropertyChanged(nameof(AllowCamera));
+            OnPropertyChanged(nameof(AllowMicrophone));
+            OnPropertyChanged(nameof(AllowFileSystem));
+            OnPropertyChanged(nameof(AllowNetwork));
+            OnPropertyChanged(nameof(AllowIpc));
+            OnPropertyChanged(nameof(AutoSetTime));
+            OnPropertyChanged(nameof(AutoSetTimeZone));
             OnPropertyChanged(nameof(SelectedTimeZone));
             OnPropertyChanged(nameof(SelectedLanguage));
             OnPropertyChanged(nameof(SelectedAccentColor));
+        }
+
+        /// <summary>
+        /// On startup, merge kernel SystemPolicies into AppSettings so UI reflects kernel state.
+        /// </summary>
+        private void SyncFromKernelPolicies()
+        {
+            if (!KernelService.Instance.IsRunning) return;
+
+            try
+            {
+                var policies = KernelService.Instance.SystemSettings.Policies;
+
+                Settings.AllowLocation = policies.AllowLocation;
+                Settings.AllowCamera = policies.AllowCamera;
+                Settings.AllowMicrophone = policies.AllowMicrophone;
+                Settings.AllowFileSystem = policies.AllowFileSystem;
+                Settings.AllowNetwork = policies.AllowNetwork;
+                Settings.AllowIpc = policies.AllowIpc;
+
+                Settings.ShowNotifications = policies.NotificationsEnabled;
+                Settings.ShowLockScreenNotifications = policies.LockScreenNotifications;
+                Settings.PlayNotificationSounds = policies.NotificationSounds;
+                Settings.QuietHoursEnabled = policies.QuietHoursEnabled;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SettingsVM] Kernel sync error: {ex.Message}");
+            }
         }
 
         private async void SaveSettings()
@@ -457,6 +564,12 @@ namespace eStarter.ViewModels
 
         private void ApplyTheme()
         {
+            // Write theme to kernel
+            if (KernelService.Instance.IsRunning)
+            {
+                KernelService.Instance.SystemSettings.SetTheme(Settings.Theme, Settings.AccentColor);
+            }
+
             Application.Current?.Dispatcher?.Invoke(() =>
             {
                 if (Settings.Theme == "Light")
@@ -492,6 +605,12 @@ namespace eStarter.ViewModels
 
         private void ApplyLanguage(string langCode)
         {
+            // Write language to kernel
+            if (KernelService.Instance.IsRunning)
+            {
+                KernelService.Instance.SystemSettings.SetLanguage(langCode);
+            }
+
             Application.Current?.Dispatcher?.Invoke(() =>
             {
                 try
@@ -521,6 +640,45 @@ namespace eStarter.ViewModels
             });
         }
 
+        /// <summary>
+        /// Push a global permission policy change into the kernel.
+        /// When toggled off, the kernel revokes that permission from every running process.
+        /// </summary>
+        private void ApplyGlobalPermissionPolicy(Permission permission, bool allowed)
+        {
+            if (!KernelService.Instance.IsRunning) return;
+
+            try
+            {
+                KernelService.Instance.SystemSettings.SetGlobalPermissionPolicy(permission, allowed);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SettingsVM] Permission policy error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Sync current notification settings into the kernel notification policy.
+        /// </summary>
+        private void SyncNotificationPolicy()
+        {
+            if (!KernelService.Instance.IsRunning) return;
+
+            try
+            {
+                KernelService.Instance.SystemSettings.SetNotificationPolicy(
+                    Settings.ShowNotifications,
+                    Settings.ShowLockScreenNotifications,
+                    Settings.PlayNotificationSounds,
+                    Settings.QuietHoursEnabled);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[SettingsVM] Notification policy error: {ex.Message}");
+            }
+        }
+
         private void BrowsePicture()
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
@@ -536,14 +694,20 @@ namespace eStarter.ViewModels
 
         private void ResetData()
         {
-            // Will be handled by the View
+            if (!KernelService.Instance.IsRunning) return;
+
+            // Terminate all running processes through kernel
+            foreach (var process in KernelService.Instance.Kernel.GetAllProcesses())
+            {
+                KernelService.Instance.Kernel.UnregisterProcess(process.AppId);
+            }
         }
 
         private void ClearCache()
         {
             if (KernelService.Instance.IsRunning)
             {
-                // Clear all app caches
+                // Clear all app caches through kernel file system
                 var apps = KernelService.Instance.Kernel.GetAllProcesses();
                 foreach (var app in apps)
                 {

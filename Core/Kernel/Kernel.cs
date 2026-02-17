@@ -71,6 +71,7 @@ namespace eStarter.Core.Kernel
         private VirtualFileSystem? _fileSystem;
         private FileSystemApiHandler? _fsApiHandler;
         private PermissionManager? _permissionManager;
+        private SystemSettingsManager? _systemSettings;
 
         // Events
         public event Action<ProcessInfo>? ProcessStarted;
@@ -80,6 +81,7 @@ namespace eStarter.Core.Kernel
         // Service accessors
         public VirtualFileSystem FileSystem => _fileSystem ?? throw new InvalidOperationException("FileSystem not initialized");
         public PermissionManager Permissions => _permissionManager ?? throw new InvalidOperationException("PermissionManager not initialized");
+        public SystemSettingsManager SystemSettings => _systemSettings ?? throw new InvalidOperationException("SystemSettings not initialized");
 
         private Kernel()
         {
@@ -95,6 +97,9 @@ namespace eStarter.Core.Kernel
 
             // Initialize permission manager
             _permissionManager = new PermissionManager(this);
+
+            // Initialize system settings
+            _systemSettings = new SystemSettingsManager(this);
         }
 
         #region Process Management
@@ -172,6 +177,8 @@ namespace eStarter.Core.Kernel
 
         /// <summary>
         /// Grant additional permissions to a process.
+        /// Respects global system policies — if a permission category is globally disabled,
+        /// the grant is silently blocked.
         /// </summary>
         public bool GrantPermission(string appId, Permission permission)
         {
@@ -180,6 +187,14 @@ namespace eStarter.Core.Kernel
 
             // Cannot grant admin/kernel permissions
             permission &= Permission.Full;
+
+            // Enforce global policies
+            if (_systemSettings != null && !_systemSettings.IsGloballyAllowed(permission))
+            {
+                Debug.WriteLine($"[Kernel] GrantPermission blocked by system policy: {permission} for {appId}");
+                return false;
+            }
+
             process.Permissions = process.Permissions.Grant(permission);
             return true;
         }
