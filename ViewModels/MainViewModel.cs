@@ -9,11 +9,13 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using eStarter.Core;
+using eStarter.Core.Hosting;
 using eStarter.Core.Kernel;
 using eStarter.Models;
 using eStarter.Services;
 using eStarter.Views;
 using System;
+using System.Collections.Concurrent;
 using System.Text.Json;
 
 namespace eStarter.ViewModels
@@ -47,6 +49,9 @@ namespace eStarter.ViewModels
         private string _currentTime = System.DateTime.Now.ToString("t");
         private System.Windows.Threading.DispatcherTimer _timer;
         private int _runningProcessCount;
+
+        // Active hosted processes keyed by appId.
+        private readonly ConcurrentDictionary<string, IAppHost> _activeHosts = new();
 
         // Kernel Service accessor
         private KernelService KernelSvc => KernelService.Instance;
@@ -426,145 +431,157 @@ namespace eStarter.ViewModels
         private void Refresh()
         {
             InstalledApps.Clear();
-            // Load installed apps from manifest or directory scan
+
+            // Always add demo tiles first
+            InstalledApps.Add(new AppEntry 
+            { 
+                Id = "demo.mail", 
+                Name = GetString("Str_DemoMailName"), 
+                Description = GetString("Str_DemoMailDesc"), 
+                BadgeCount = 5, 
+                Background = "#FF0078D7",
+                TileSize = TileSize.Medium,
+                Publisher = "Microsoft Corporation",
+                Category = "Productivity",
+                Version = "1.2.0"
+            });
+
+            InstalledApps.Add(new AppEntry 
+            { 
+                Id = "demo.calendar", 
+                Name = GetString("Str_DemoCalendarName"), 
+                Description = GetString("Str_DemoCalendarDesc"), 
+                Background = "#FF1BA1E2",
+                TileSize = TileSize.Medium,
+                Publisher = "Microsoft Corporation",
+                Category = "Productivity"
+            });
+
+            InstalledApps.Add(new AppEntry 
+            { 
+                Id = "demo.photos", 
+                Name = GetString("Str_DemoPhotosName"), 
+                Description = GetString("Str_DemoPhotosDesc"), 
+                Background = "#FFD24726",
+                TileSize = TileSize.Wide,
+                Publisher = "Microsoft Corporation",
+                Category = "Photo & Video"
+            });
+
+            InstalledApps.Add(new AppEntry 
+            { 
+                Id = "demo.music", 
+                Name = GetString("Str_DemoMusicName"), 
+                Description = GetString("Str_DemoMusicDesc"), 
+                Background = "#FFF09609",
+                TileSize = TileSize.Medium,
+                Publisher = "Microsoft Corporation",
+                Category = "Music"
+            });
+
+            InstalledApps.Add(new AppEntry 
+            { 
+                Id = "demo.store", 
+                Name = GetString("Str_DemoStoreName"), 
+                Description = GetString("Str_DemoStoreDesc"), 
+                Background = "#FF00A1F1",
+                TileSize = TileSize.Medium,
+                Publisher = "Microsoft Corporation",
+                Category = "Shopping"
+            });
+
+            InstalledApps.Add(new AppEntry 
+            { 
+                Id = "demo.news", 
+                Name = GetString("Str_DemoNewsName"), 
+                Description = GetString("Str_DemoNewsDesc"), 
+                BadgeCount = 12,
+                Background = "#FF7E3878",
+                TileSize = TileSize.Wide,
+                Publisher = "Microsoft Corporation",
+                Category = "News & Weather"
+            });
+
+            InstalledApps.Add(new AppEntry 
+            { 
+                Id = "demo.weather", 
+                Name = GetString("Str_DemoWeatherName"), 
+                Description = GetString("Str_DemoWeatherDesc"), 
+                Background = "#FF00ABA9",
+                TileSize = TileSize.Medium,
+                Publisher = "Microsoft Corporation",
+                Category = "News & Weather"
+            });
+
+            InstalledApps.Add(new AppEntry
+            {
+                Id = "demo.settings",
+                Name = GetString("Str_DemoSettingsName"),
+                Description = GetString("Str_DemoSettingsDesc"), 
+                Background = "#FF647687",
+                TileSize = TileSize.Medium,
+                Publisher = "System",
+                Category = "System"
+            });
+
+            InstalledApps.Add(new AppEntry
+            {
+                Id = "demo.about",
+                Name = GetString("Str_DemoAboutName"),
+                Description = GetString("Str_DemoAboutDesc"), 
+                Background = "#FF2D2D30",
+                TileSize = TileSize.Medium,
+                Publisher = "System",
+                Category = "System"
+            });
+
+            // Append installed apps from disk
             foreach (var app in _manager.GetInstalledAppEntries())
-                InstalledApps.Add(app);
-
-            // Add demo tiles if empty with varied sizes and colors (Metro style)
-            if (!InstalledApps.Any())
             {
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.mail", 
-                    Name = GetString("Str_DemoMailName"), 
-                    Description = GetString("Str_DemoMailDesc"), 
-                    BadgeCount = 5, 
-                    Background = "#FF0078D7",
-                    TileSize = TileSize.Medium,
-                    Publisher = "Microsoft Corporation",
-                    Category = "Productivity",
-                    Version = "1.2.0"
-                });
-                
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.calendar", 
-                    Name = GetString("Str_DemoCalendarName"), 
-                    Description = GetString("Str_DemoCalendarDesc"), 
-                    Background = "#FF1BA1E2",
-                    TileSize = TileSize.Medium,
-                    Publisher = "Microsoft Corporation",
-                    Category = "Productivity"
-                });
-                
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.photos", 
-                    Name = GetString("Str_DemoPhotosName"), 
-                    Description = GetString("Str_DemoPhotosDesc"), 
-                    Background = "#FFD24726",
-                    TileSize = TileSize.Wide,
-                    Publisher = "Microsoft Corporation",
-                    Category = "Photo & Video"
-                });
-                
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.music", 
-                    Name = GetString("Str_DemoMusicName"), 
-                    Description = GetString("Str_DemoMusicDesc"), 
-                    Background = "#FFF09609",
-                    TileSize = TileSize.Medium,
-                    Publisher = "Microsoft Corporation",
-                    Category = "Music"
-                });
-                
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.store", 
-                    Name = GetString("Str_DemoStoreName"), 
-                    Description = GetString("Str_DemoStoreDesc"), 
-                    Background = "#FF00A1F1",
-                    TileSize = TileSize.Medium,
-                    Publisher = "Microsoft Corporation",
-                    Category = "Shopping"
-                });
-                
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.news", 
-                    Name = GetString("Str_DemoNewsName"), 
-                    Description = GetString("Str_DemoNewsDesc"), 
-                    BadgeCount = 12,
-                    Background = "#FF7E3878",
-                    TileSize = TileSize.Wide,
-                    Publisher = "Microsoft Corporation",
-                    Category = "News & Weather"
-                });
-                
-                InstalledApps.Add(new AppEntry 
-                { 
-                    Id = "demo.weather", 
-                    Name = GetString("Str_DemoWeatherName"), 
-                    Description = GetString("Str_DemoWeatherDesc"), 
-                    Background = "#FF00ABA9",
-                    TileSize = TileSize.Medium,
-                    Publisher = "Microsoft Corporation",
-                    Category = "News & Weather"
-                });
-
-                InstalledApps.Add(new AppEntry
-                {
-                    Id = "demo.settings",
-                    Name = GetString("Str_DemoSettingsName"),
-                    Description = GetString("Str_DemoSettingsDesc"), 
-                    Background = "#FF647687",
-                    TileSize = TileSize.Medium,
-                    Publisher = "System",
-                    Category = "System"
-                });
-            }
-
-            // Ensure About and Settings tiles exist so user can always access them
-            if (!InstalledApps.Any(x => x.Id == "demo.about"))
-            {
-                InstalledApps.Add(new AppEntry
-                {
-                    Id = "demo.about",
-                    Name = GetString("Str_DemoAboutName"),
-                    Description = GetString("Str_DemoAboutDesc"), 
-                    Background = "#FF2D2D30",
-                    TileSize = TileSize.Medium,
-                    Publisher = "System",
-                    Category = "System"
-                });
-            }
-
-            if (!InstalledApps.Any(x => x.Id == "demo.settings"))
-            {
-                InstalledApps.Add(new AppEntry
-                {
-                    Id = "demo.settings",
-                    Name = GetString("Str_DemoSettingsName"),
-                    Description = GetString("Str_DemoSettingsDesc"), 
-                    Background = "#FF647687",
-                    TileSize = TileSize.Medium,
-                    Publisher = "System",
-                    Category = "System"
-                });
+                if (!InstalledApps.Any(x => x.Id == app.Id))
+                    InstalledApps.Add(app);
             }
         }
 
         private async Task InstallAsync()
         {
-            // For MVP: look for a package in the application's folder named "sample.app.zip"
-            var appDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var candidate = Path.Combine(appDir ?? string.Empty, "sample.app.zip");
-            if (File.Exists(candidate))
+            var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                await _manager.InstallAsync(candidate);
+                Title = GetString("Str_InstallDialogTitle"),
+                Filter = "eStarter App (*.eapp)|*.eapp|All Files (*.*)|*.*",
+                DefaultExt = ".eapp",
+                Multiselect = false
+            };
+
+            if (dialog.ShowDialog(Application.Current.MainWindow) != true)
+                return;
+
+            var packagePath = dialog.FileName;
+
+            try
+            {
+                await _manager.InstallAsync(packagePath);
+
                 Application.Current.Dispatcher.Invoke(() => Refresh());
                 await SaveSettingsAsync();
+
+                await KernelSvc.Notifications.ShowAsync(
+                    GetString("Str_InstallSuccessTitle"),
+                    string.Format(GetString("Str_InstallSuccessMsg"), Path.GetFileNameWithoutExtension(packagePath)),
+                    NotificationType.Success,
+                    3000);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[MainViewModel] Install failed: {ex.Message}");
+                Application.Current?.Dispatcher?.Invoke(() =>
+                {
+                    ModernMsgBox.ShowMessage(
+                        string.Format(GetString("Str_InstallErrorMsg"), ex.Message),
+                        GetString("Str_InstallErrorTitle"),
+                        MessageBoxButton.OK,
+                        Application.Current.MainWindow);
+                });
             }
         }
 
@@ -647,49 +664,119 @@ namespace eStarter.ViewModels
                 return;
             }
 
-            // Use explicit ExePath from manifest if available, otherwise search
-            string? exePath = null;
-            if (!string.IsNullOrEmpty(app.ExePath))
+            // Try manifest-based hosted launch first.
+            var manifestPath = Path.Combine(baseDir, "manifest.json");
+            AppManifest? manifest = null;
+            if (File.Exists(manifestPath))
             {
-                exePath = Path.Combine(baseDir, app.ExePath);
-            }
-            
-            if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
-            {
-                exePath = Directory.EnumerateFiles(baseDir, "*.exe", SearchOption.TopDirectoryOnly).FirstOrDefault();
+                try
+                {
+                    var json = File.ReadAllText(manifestPath);
+                    manifest = JsonSerializer.Deserialize<AppManifest>(json);
+                }
+                catch { /* malformed manifest — fall through to legacy */ }
             }
 
-            if (exePath == null)
+            // Fill in entry / exePath if missing.
+            var entryRelative = manifest?.Entry ?? manifest?.ExePath ?? app.ExePath;
+            if (string.IsNullOrEmpty(entryRelative))
+            {
+                entryRelative = Directory.EnumerateFiles(baseDir, "*.exe", SearchOption.TopDirectoryOnly)
+                    .Select(Path.GetFileName)
+                    .FirstOrDefault();
+            }
+
+            if (string.IsNullOrEmpty(entryRelative))
             {
                 Application.Current?.Dispatcher?.Invoke(() =>
                 {
                     ModernMsgBox.ShowMessage(
-                        string.Format(GetString("Str_LaunchErrorMsg"), app.Name), 
-                        GetString("Str_LaunchErrorTitle"), 
-                        MessageBoxButton.OK, 
+                        string.Format(GetString("Str_LaunchErrorMsg"), app.Name),
+                        GetString("Str_LaunchErrorTitle"),
+                        MessageBoxButton.OK,
                         Application.Current.MainWindow);
                 });
                 return;
             }
 
+            // Build a manifest if we don't have one (legacy apps with no manifest.json).
+            manifest ??= new AppManifest { Id = app.Id, Name = app.Name ?? app.Id };
+            if (string.IsNullOrEmpty(manifest.Entry) && string.IsNullOrEmpty(manifest.ExePath))
+                manifest.Entry = entryRelative;
+            if (string.IsNullOrEmpty(manifest.Id))
+                manifest.Id = app.Id;
+            if (!string.IsNullOrEmpty(app.Arguments) && string.IsNullOrEmpty(manifest.Arguments))
+                manifest.Arguments = app.Arguments;
+
             try
             {
-                var psi = new ProcessStartInfo(exePath)
+                // Stop previous host if still tracked.
+                if (_activeHosts.TryRemove(app.Id, out var prev))
                 {
-                    WorkingDirectory = Path.GetDirectoryName(exePath) ?? baseDir,
-                    UseShellExecute = true
-                };
-
-                if (!string.IsNullOrEmpty(app.Arguments))
-                {
-                    psi.Arguments = app.Arguments;
+                    _ = Task.Run(async () =>
+                    {
+                        try { await prev.DisposeAsync().ConfigureAwait(false); }
+                        catch (Exception ex) { Debug.WriteLine($"[MainViewModel] Dispose prev host: {ex.Message}"); }
+                    });
                 }
 
-                Process.Start(psi);
+                var host = AppHostFactory.Create(manifest, baseDir, KernelSvc.Kernel);
+                host.Exited += OnHostExited;
+                _activeHosts[app.Id] = host;
+
+                // For WASM apps, open a viewer window on the UI thread before starting.
+                if (host is eStarter.Core.Hosting.WasmAppHost wasmHost)
+                {
+                    Application.Current?.Dispatcher?.Invoke(() =>
+                    {
+                        var viewer = new Views.WasmViewerWindow(
+                            wasmHost,
+                            manifest.Name ?? app.Name ?? app.Id,
+                            manifest.MemoryLimitMb);
+                        viewer.Show();
+                    });
+                }
+
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await host.StartAsync().ConfigureAwait(false);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[MainViewModel] Host start failed for {app.Id}: {ex.Message}");
+                    }
+                });
             }
-            catch
+            catch (Exception ex)
             {
-                // swallow for MVP -- real app should log or surface error
+                Debug.WriteLine($"[MainViewModel] LaunchApp error for {app.Id}: {ex.Message}");
+            }
+        }
+
+        private void OnHostExited(object? sender, AppHostExitedEventArgs e)
+        {
+            if (_activeHosts.TryRemove(e.AppId, out var host))
+            {
+                _ = Task.Run(async () =>
+                {
+                    try { await host.DisposeAsync().ConfigureAwait(false); }
+                    catch { /* already cleaned up */ }
+                });
+            }
+            Debug.WriteLine($"[MainViewModel] Host exited: {e.AppId} code={e.ExitCode}");
+        }
+
+        /// <summary>
+        /// Stop a hosted app by ID.
+        /// </summary>
+        public async Task StopAppAsync(string appId)
+        {
+            if (_activeHosts.TryRemove(appId, out var host))
+            {
+                await host.StopAsync().ConfigureAwait(false);
+                await host.DisposeAsync().ConfigureAwait(false);
             }
         }
 

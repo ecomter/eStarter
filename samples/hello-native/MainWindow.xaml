@@ -1,0 +1,63 @@
+<Window x:Class="HelloNative.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Hello Native — eStarter Sample" Height="520" Width="480"
+        WindowStartupLocation="CenterScreen"
+        Background="#FF1D1D1D" Foreground="White"
+        FontFamily="Segoe UI" Loaded="Window_Loaded">
+    <Grid Margin="24">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="🚀 Hello Native" FontSize="28" FontWeight="Light"/>
+            <TextBlock x:Name="SubtitleText" Text="eStarter ProcessHost Sample App"
+                       FontSize="13" Opacity="0.6" Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Connection Status -->
+        <Border Grid.Row="1" Background="#FF2D2D2D" CornerRadius="6" Padding="16" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="CONNECTION" FontSize="11" FontWeight="SemiBold" Opacity="0.5" Margin="0,0,0,8"/>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock x:Name="ModeText" FontSize="13"/>
+                        <TextBlock x:Name="ConnectedText" FontSize="13" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <Ellipse x:Name="StatusDot" Grid.Column="1" Width="12" Height="12"
+                             VerticalAlignment="Center" Fill="Gray"/>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!-- Log Output -->
+        <Border Grid.Row="2" Background="#FF2D2D2D" CornerRadius="6" Padding="12" Margin="0,0,0,16">
+            <ScrollViewer x:Name="LogScroller" VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="LogOutput" TextWrapping="Wrap" FontFamily="Cascadia Code, Consolas"
+                           FontSize="12" Foreground="#FFCCCCCC"/>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Action Buttons -->
+        <UniformGrid Grid.Row="3" Columns="3" Margin="0,0,0,0">
+            <Button Content="🏓 Ping" Click="Ping_Click" Margin="0,0,4,0"
+                    Height="36" Background="#FF00B159" Foreground="White" BorderThickness="0"
+                    FontSize="13" Cursor="Hand"/>
+            <Button Content="🔑 Request Perm" Click="RequestPerm_Click" Margin="4,0,4,0"
+                    Height="36" Background="#FF0078D7" Foreground="White" BorderThickness="0"
+                    FontSize="13" Cursor="Hand"/>
+            <Button Content="ℹ️ Sys Info" Click="SysInfo_Click" Margin="4,0,0,0"
+                    Height="36" Background="#FF8764B8" Foreground="White" BorderThickness="0"
+                    FontSize="13" Cursor="Hand"/>
+        </UniformGrid>
+    </Grid>
+</Window>

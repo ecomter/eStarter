@@ -1,0 +1,16 @@
+{
+  "id": "hello.wasm",
+  "name": "Hello WASM",
+  "description": "WebAssembly sandbox demo",
+  "publisher": "eStarter",
+  "version": "1.0.0",
+  "category": "Developer Tools",
+  "runtime": "Wasm",
+  "entry": "hello.wasm",
+  "background": "#FF8764B8",
+  "tileSize": "Medium",
+  "permissions": ["SystemInfo"],
+  "sandboxed": true,
+  "memoryLimitMb": 16,
+  "maxRuntimeSeconds": 30
+}

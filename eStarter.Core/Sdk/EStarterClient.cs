@@ -6,13 +6,15 @@ using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using eStarter.Sdk.Transport;
 using IpcTypes = eStarter.Sdk.Ipc;
 
 namespace eStarter.Sdk
 {
     /// <summary>
     /// eStarter SDK client for child applications.
-    /// Provides type-safe access to system APIs.
+    /// Auto-detects <c>ESTARTER_MODE=hosted</c> to use stdio JSON-RPC transport;
+    /// otherwise falls back to named-pipe IPC.
     /// </summary>
     public sealed class EStarterClient : IAsyncDisposable, IDisposable
     {
@@ -21,12 +23,21 @@ namespace eStarter.Sdk
 
         private readonly string _appId;
         private readonly string _version;
+
+        // Named-pipe transport (legacy)
         private NamedPipeClientStream? _pipe;
         private readonly ConcurrentDictionary<uint, TaskCompletionSource<IpcTypes.IpcMessage>> _pendingRequests = new();
         private CancellationTokenSource? _cts;
         private Task? _receiveTask;
+
+        // Stdio JSON-RPC transport (hosted mode)
+        private StdioTransport? _stdioTransport;
+
         private bool _disposed;
         private int _connected;
+
+        /// <summary>Whether this client runs inside a <c>ProcessHost</c> (stdio JSON-RPC mode).</summary>
+        public bool IsHostedMode { get; }
 
         // Sub-API accessors
         public FileSystemApi FileSystem { get; }
@@ -45,13 +56,17 @@ namespace eStarter.Sdk
         /// </summary>
         public event Action<string, JsonElement?>? EventReceived;
 
-        public bool IsConnected => _connected == 1 && _pipe?.IsConnected == true;
+        public bool IsConnected => _connected == 1 &&
+            (IsHostedMode ? _stdioTransport?.IsConnected == true : _pipe?.IsConnected == true);
         public string AppId => _appId;
 
         public EStarterClient(string appId, string version = "1.0.0")
         {
             _appId = appId ?? throw new ArgumentNullException(nameof(appId));
             _version = version;
+            IsHostedMode = string.Equals(
+                Environment.GetEnvironmentVariable("ESTARTER_MODE"),
+                "hosted", StringComparison.OrdinalIgnoreCase);
 
             FileSystem = new FileSystemApi(this);
             Permissions = new PermissionApi(this);
@@ -64,12 +79,44 @@ namespace eStarter.Sdk
 
         /// <summary>
         /// Connect to the eStarter system bus.
+        /// In hosted mode, initialises the stdio JSON-RPC transport immediately.
+        /// In pipe mode, connects to the named pipe and performs handshake.
         /// </summary>
         public async Task<bool> ConnectAsync(CancellationToken ct = default)
         {
             if (_disposed) throw new ObjectDisposedException(nameof(EStarterClient));
             if (IsConnected) return true;
 
+            if (IsHostedMode)
+                return ConnectStdio();
+
+            return await ConnectPipeAsync(ct).ConfigureAwait(false);
+        }
+
+        private bool ConnectStdio()
+        {
+            try
+            {
+                _stdioTransport = new StdioTransport();
+                _stdioTransport.Disconnected += () =>
+                {
+                    Interlocked.Exchange(ref _connected, 0);
+                    Disconnected?.Invoke();
+                };
+                _stdioTransport.Start();
+                Interlocked.Exchange(ref _connected, 1);
+                Debug.WriteLine("[SDK] Connected via stdio JSON-RPC (hosted mode).");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[SDK] Stdio connect failed: {ex.Message}");
+                return false;
+            }
+        }
+
+        private async Task<bool> ConnectPipeAsync(CancellationToken ct)
+        {
             try
             {
                 _pipe = new NamedPipeClientStream(".", PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
@@ -98,7 +145,7 @@ namespace eStarter.Sdk
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"[SDK] Connect failed: {ex.Message}");
+                Debug.WriteLine($"[SDK] Pipe connect failed: {ex.Message}");
                 await DisconnectAsync().ConfigureAwait(false);
                 return false;
             }
@@ -110,6 +157,13 @@ namespace eStarter.Sdk
         public async Task DisconnectAsync()
         {
             Interlocked.Exchange(ref _connected, 0);
+
+            if (_stdioTransport != null)
+            {
+                await _stdioTransport.DisposeAsync().ConfigureAwait(false);
+                _stdioTransport = null;
+            }
+
             _cts?.Cancel();
 
             if (_receiveTask != null)
@@ -129,12 +183,81 @@ namespace eStarter.Sdk
 
         /// <summary>
         /// Send an API request and wait for response.
+        /// Routes through stdio JSON-RPC in hosted mode, named pipe otherwise.
         /// </summary>
         internal async Task<ApiResult<T>> CallApiAsync<T>(ushort command, object? data = null, int timeoutMs = DefaultTimeoutMs)
         {
             if (!IsConnected)
                 return ApiResult<T>.Fail(ApiStatus.Error, "Not connected");
 
+            if (IsHostedMode)
+                return await CallApiViaStdioAsync<T>(command, data, timeoutMs).ConfigureAwait(false);
+
+            return await CallApiViaPipeAsync<T>(command, data, timeoutMs).ConfigureAwait(false);
+        }
+
+        private async Task<ApiResult<T>> CallApiViaStdioAsync<T>(ushort command, object? data, int timeoutMs)
+        {
+            if (_stdioTransport == null)
+                return ApiResult<T>.Fail(ApiStatus.Error, "Stdio transport not initialised");
+
+            // Resolve enum name from the ushort command code.
+            var cmdName = Enum.IsDefined(typeof(Core.Kernel.ApiCommand), command)
+                ? ((Core.Kernel.ApiCommand)command).ToString()
+                : command.ToString();
+
+            JsonElement? jsonData = data != null
+                ? JsonSerializer.SerializeToElement(data)
+                : null;
+
+            var result = await _stdioTransport.CallApiAsync(cmdName, jsonData, timeoutMs)
+                .ConfigureAwait(false);
+
+            if (!result.Success)
+            {
+                var status = result.Error == "Timeout" ? ApiStatus.Timeout : ApiStatus.Error;
+                return ApiResult<T>.Fail(status, result.Error ?? "RPC failed");
+            }
+
+            // The host returns a serialised ApiResponse inside result.Data.
+            return ParseStdioResponse<T>(result.Data);
+        }
+
+        private static ApiResult<T> ParseStdioResponse<T>(JsonElement? element)
+        {
+            if (element == null)
+                return ApiResult<T>.Fail(ApiStatus.Error, "Empty response");
+
+            try
+            {
+                var el = element.Value;
+
+                byte status = 0;
+                if (el.TryGetProperty("status", out var sProp))
+                    status = sProp.GetByte();
+
+                if (status != 0)
+                {
+                    var error = el.TryGetProperty("error", out var eProp) ? eProp.GetString() : "Unknown error";
+                    return ApiResult<T>.Fail((ApiStatus)status, error ?? "Unknown error");
+                }
+
+                if (el.TryGetProperty("data", out var dProp) && dProp.ValueKind != JsonValueKind.Null)
+                {
+                    var value = JsonSerializer.Deserialize<T>(dProp.GetRawText());
+                    return ApiResult<T>.Ok(value!);
+                }
+
+                return ApiResult<T>.Ok(default!);
+            }
+            catch (Exception ex)
+            {
+                return ApiResult<T>.Fail(ApiStatus.Error, ex.Message);
+            }
+        }
+
+        private async Task<ApiResult<T>> CallApiViaPipeAsync<T>(ushort command, object? data, int timeoutMs)
+        {
             var payload = data != null ? IpcTypes.IpcSerializer.Serialize(data) : string.Empty;
             var message = IpcTypes.IpcMessage.CreateApiRequest(_appId, command, payload);
 

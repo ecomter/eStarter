@@ -69,6 +69,11 @@
     <sys:String x:Key="Str_ResetCompleteMsg">应用数据已重置。请重启应用程序。</sys:String>
     <sys:String x:Key="Str_ResetCompleteTitle">重置完成</sys:String>
     <sys:String x:Key="Str_ErrorTitle">错误</sys:String>
+    <sys:String x:Key="Str_InstallDialogTitle">安装 eStarter 应用</sys:String>
+    <sys:String x:Key="Str_InstallSuccessTitle">安装成功</sys:String>
+    <sys:String x:Key="Str_InstallSuccessMsg">"{0}" 已安装成功。</sys:String>
+    <sys:String x:Key="Str_InstallErrorTitle">安装失败</sys:String>
+    <sys:String x:Key="Str_InstallErrorMsg">安装失败：{0}</sys:String>
     <sys:String x:Key="Str_NotImplemented">此部分在此演示中未实现。</sys:String>
     <sys:String x:Key="Str_DefaultMessageTitle">消息</sys:String>
     <sys:String x:Key="Str_ConfirmTitle">确认</sys:String>
@@ -78,6 +83,37 @@
     <sys:String x:Key="Str_ButtonCancel">取消</sys:String>
     <sys:String x:Key="Str_ButtonYes">是</sys:String>
     <sys:String x:Key="Str_ButtonNo">否</sys:String>
+
+    <!-- Permission Dialog -->
+    <sys:String x:Key="Str_PermDialogTitle">权限请求</sys:String>
+    <sys:String x:Key="Str_PermDialogRequesting">正在请求以下权限：</sys:String>
+    <sys:String x:Key="Str_PermDialogAllow">允许</sys:String>
+    <sys:String x:Key="Str_PermDialogDeny">拒绝</sys:String>
+    <sys:String x:Key="Str_Perm_FileRead">读取文件</sys:String>
+    <sys:String x:Key="Str_Perm_FileWrite">写入文件</sys:String>
+    <sys:String x:Key="Str_Perm_FileDelete">删除文件</sys:String>
+    <sys:String x:Key="Str_Perm_FileSystem">完整文件系统访问</sys:String>
+    <sys:String x:Key="Str_Perm_NetworkAccess">网络访问</sys:String>
+    <sys:String x:Key="Str_Perm_NetworkListen">网络监听</sys:String>
+    <sys:String x:Key="Str_Perm_Network">完整网络访问</sys:String>
+    <sys:String x:Key="Str_Perm_Notification">显示通知</sys:String>
+    <sys:String x:Key="Str_Perm_Clipboard">访问剪贴板</sys:String>
+    <sys:String x:Key="Str_Perm_Dialog">显示对话框</sys:String>
+    <sys:String x:Key="Str_Perm_Overlay">显示覆盖层</sys:String>
+    <sys:String x:Key="Str_Perm_UI">完整 UI 访问</sys:String>
+    <sys:String x:Key="Str_Perm_ProcessLaunch">启动其他应用</sys:String>
+    <sys:String x:Key="Str_Perm_ProcessKill">终止其他应用</sys:String>
+    <sys:String x:Key="Str_Perm_SystemSettings">修改系统设置</sys:String>
+    <sys:String x:Key="Str_Perm_SystemInfo">访问系统信息</sys:String>
+    <sys:String x:Key="Str_Perm_System">完整系统访问</sys:String>
+    <sys:String x:Key="Str_Perm_IpcSend">发送消息</sys:String>
+    <sys:String x:Key="Str_Perm_IpcReceive">接收消息</sys:String>
+    <sys:String x:Key="Str_Perm_IpcBroadcast">广播消息</sys:String>
+    <sys:String x:Key="Str_Perm_Ipc">完整 IPC 访问</sys:String>
+    <sys:String x:Key="Str_Perm_Camera">访问摄像头</sys:String>
+    <sys:String x:Key="Str_Perm_Microphone">访问麦克风</sys:String>
+    <sys:String x:Key="Str_Perm_Location">访问位置</sys:String>
+    <sys:String x:Key="Str_Perm_Hardware">完整硬件访问</sys:String>
 
     <!-- Demo apps (names/descriptions) -->
     <sys:String x:Key="Str_DemoMailName">邮件</sys:String>

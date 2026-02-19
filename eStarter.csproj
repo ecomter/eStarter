@@ -12,13 +12,46 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Exclude sub-projects from compilation (they are separate projects) -->
+    <!-- Exclude sub-projects and temp directories from compilation -->
     <Compile Remove="eStarter.Core\**" />
     <Compile Remove="eStarter.Abstractions\**" />
+    <Compile Remove="eStarter.Tests\**" />
+    <Compile Remove="samples\**" />
+    <Compile Remove="tmp_*\**" />
+    <Page Remove="eStarter.Core\**" />
+    <Page Remove="eStarter.Abstractions\**" />
+    <Page Remove="eStarter.Tests\**" />
+    <Page Remove="samples\**" />
+    <Page Remove="tmp_*\**" />
+    <ApplicationDefinition Remove="samples\**" />
     <None Remove="eStarter.Core\**" />
     <None Remove="eStarter.Abstractions\**" />
+    <None Remove="eStarter.Tests\**" />
+    <None Remove="samples\**" />
+    <None Remove="tmp_*\**" />
     <EmbeddedResource Remove="eStarter.Core\**" />
     <EmbeddedResource Remove="eStarter.Abstractions\**" />
+    <EmbeddedResource Remove="eStarter.Tests\**" />
+    <EmbeddedResource Remove="samples\**" />
+    <EmbeddedResource Remove="tmp_*\**" />
+
+    <!--
+      Remove local copies of files that already exist in eStarter.Core.
+      The WPF project consumes these types via ProjectReference.
+    -->
+    <Compile Remove="Core\AppManager.cs" />
+    <Compile Remove="Core\SystemBus.cs" />
+    <Compile Remove="Core\Kernel\**" />
+    <Compile Remove="Models\AppManifest.cs" />
+    <Compile Remove="Models\AppEntry.cs" />
+    <Compile Remove="Models\AppSettings.cs" />
+    <Compile Remove="Models\CalendarModels.cs" />
+    <Compile Remove="Sdk\**" />
+    <Compile Remove="Services\AppInstaller.cs" />
+    <Compile Remove="Services\IAppInstaller.cs" />
+    <Compile Remove="Services\ISettingsService.cs" />
+    <Compile Remove="Services\SettingsService.cs" />
+    <Compile Remove="ViewModels\RelayCommand.cs" />
   </ItemGroup>
 
   <ItemGroup>

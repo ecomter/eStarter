@@ -11,4 +11,9 @@
     <ProjectReference Include="..\eStarter.Abstractions\eStarter.Abstractions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="StreamJsonRpc" Version="2.24.84" />
+    <PackageReference Include="Wasmtime" Version="22.0.0" />
+  </ItemGroup>
+
 </Project>

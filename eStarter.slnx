@@ -1,5 +1,10 @@
 <Solution>
+  <Folder Name="/samples/" />
+  <Folder Name="/samples/hello-native/">
+    <Project Path="samples/hello-native/HelloNative.csproj" />
+  </Folder>
   <Project Path="eStarter.Abstractions/eStarter.Abstractions.csproj" />
   <Project Path="eStarter.Core/eStarter.Core.csproj" />
   <Project Path="eStarter.csproj" />
+  <Project Path="eStarter.Tests/eStarter.Tests.csproj" />
 </Solution>

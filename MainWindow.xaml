@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:eStarter"
-        xmlns:models="clr-namespace:eStarter.Models"
+        xmlns:models="clr-namespace:eStarter.Models;assembly=eStarter.Core"
         xmlns:conv="clr-namespace:eStarter.Converters"
         mc:Ignorable="d"
         Title="{DynamicResource Str_AppName}" Height="700" Width="1200"

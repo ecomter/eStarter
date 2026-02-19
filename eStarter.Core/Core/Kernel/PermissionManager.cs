@@ -62,25 +62,50 @@ namespace eStarter.Core.Kernel
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            // UI should subscribe to this event and call Complete
+            // UI should subscribe to this event and call CompleteRequest,
+            // which fires PermissionRequested again with allowed=true/false.
+            // We only listen for the completion callback (allowed != initial false).
             void Handler(string id, Permission perm, bool allowed)
             {
-                if (id == appId && perm == permission)
+                // Ignore the initial request broadcast (allowed=false).
+                // Only respond to the completion callback from CompleteRequest.
+                if (id == appId && perm == permission && allowed)
                 {
                     PermissionRequested -= Handler;
-                    tcs.TrySetResult(allowed);
+                    tcs.TrySetResult(true);
                 }
             }
 
-            PermissionRequested += Handler;
+            // Handler for denial — CompleteRequest fires with allowed=false too,
+            // but we need a separate path since the initial broadcast is also allowed=false.
+            // Solution: use a flag to skip the initial invocation.
+            bool initialRaised = false;
+            void FullHandler(string id, Permission perm, bool allowed)
+            {
+                if (id != appId || perm != permission)
+                    return;
 
-            // Raise event for UI
+                if (!initialRaised)
+                {
+                    // Skip the initial broadcast we fire below.
+                    initialRaised = true;
+                    return;
+                }
+
+                // This is the completion callback from CompleteRequest.
+                PermissionRequested -= FullHandler;
+                tcs.TrySetResult(allowed);
+            }
+
+            PermissionRequested += FullHandler;
+
+            // Raise event for UI to show the permission dialog.
             PermissionRequested?.Invoke(appId, permission, false);
 
             // Timeout after 30 seconds
             Task.Delay(30000).ContinueWith(_ =>
             {
-                PermissionRequested -= Handler;
+                PermissionRequested -= FullHandler;
                 tcs.TrySetResult(false);
             });
 

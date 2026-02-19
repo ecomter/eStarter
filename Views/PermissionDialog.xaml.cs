@@ -10,6 +10,9 @@ namespace eStarter.Views
         public string AppId { get; }
         public Permission RequestedPermission { get; }
 
+        private string GetStr(string key)
+            => Application.Current.Resources[key] as string ?? key;
+
         public PermissionDialog(string appId, Permission permission, string? appName = null)
         {
             InitializeComponent();
@@ -20,7 +23,10 @@ namespace eStarter.Views
             AppNameText.Text = appName ?? appId;
             PermissionText.Text = GetPermissionDisplayName(permission);
             PermissionIcon.Text = GetPermissionIcon(permission);
-            TitleText.Text = "Permission Request";
+            TitleText.Text = GetStr("Str_PermDialogTitle");
+            RequestingText.Text = GetStr("Str_PermDialogRequesting");
+            AllowButton.Content = GetStr("Str_PermDialogAllow");
+            DenyButton.Content = GetStr("Str_PermDialogDeny");
         }
 
         private void AllowButton_Click(object sender, RoutedEventArgs e)
@@ -39,6 +45,40 @@ namespace eStarter.Views
 
         private static string GetPermissionDisplayName(Permission permission)
         {
+            var key = "Str_Perm_" + permission switch
+            {
+                Permission.FileRead => "FileRead",
+                Permission.FileWrite => "FileWrite",
+                Permission.FileDelete => "FileDelete",
+                Permission.FileSystem => "FileSystem",
+                Permission.NetworkAccess => "NetworkAccess",
+                Permission.NetworkListen => "NetworkListen",
+                Permission.Network => "Network",
+                Permission.Notification => "Notification",
+                Permission.Clipboard => "Clipboard",
+                Permission.Dialog => "Dialog",
+                Permission.Overlay => "Overlay",
+                Permission.UI => "UI",
+                Permission.ProcessLaunch => "ProcessLaunch",
+                Permission.ProcessKill => "ProcessKill",
+                Permission.SystemSettings => "SystemSettings",
+                Permission.SystemInfo => "SystemInfo",
+                Permission.System => "System",
+                Permission.IpcSend => "IpcSend",
+                Permission.IpcReceive => "IpcReceive",
+                Permission.IpcBroadcast => "IpcBroadcast",
+                Permission.Ipc => "Ipc",
+                Permission.Camera => "Camera",
+                Permission.Microphone => "Microphone",
+                Permission.Location => "Location",
+                Permission.Hardware => "Hardware",
+                _ => ""
+            };
+
+            if (!string.IsNullOrEmpty(key) && Application.Current.Resources[key] is string localized)
+                return localized;
+
+            // Fallback to English
             return permission switch
             {
                 Permission.FileRead => "Read Files",

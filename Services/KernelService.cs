@@ -171,10 +171,23 @@ namespace eStarter.Services
 
         /// <summary>
         /// Handle permission request from kernel.
+        /// Only forward initial requests to UI, not completion callbacks from CompleteRequest.
         /// </summary>
-        private void OnPermissionRequested(string appId, Permission permission, bool _)
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> _pendingPermissions = new();
+
+        private void OnPermissionRequested(string appId, Permission permission, bool allowed)
         {
-            DispatchToUI(() => PermissionRequested?.Invoke(appId, permission));
+            var key = $"{appId}:{permission}";
+            if (!allowed && _pendingPermissions.TryAdd(key, true))
+            {
+                // Initial request — show dialog
+                DispatchToUI(() => PermissionRequested?.Invoke(appId, permission));
+            }
+            else
+            {
+                // Completion callback — remove tracking
+                _pendingPermissions.TryRemove(key, out _);
+            }
         }
 
         /// <summary>

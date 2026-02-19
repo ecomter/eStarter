@@ -76,6 +76,11 @@
     <sys:String x:Key="Str_ResetCompleteMsg">App data has been reset. Please restart the application.</sys:String>
     <sys:String x:Key="Str_ResetCompleteTitle">Reset Complete</sys:String>
     <sys:String x:Key="Str_ErrorTitle">Error</sys:String>
+    <sys:String x:Key="Str_InstallDialogTitle">Install eStarter App</sys:String>
+    <sys:String x:Key="Str_InstallSuccessTitle">App Installed</sys:String>
+    <sys:String x:Key="Str_InstallSuccessMsg">'{0}' has been installed successfully.</sys:String>
+    <sys:String x:Key="Str_InstallErrorTitle">Installation Failed</sys:String>
+    <sys:String x:Key="Str_InstallErrorMsg">Failed to install: {0}</sys:String>
     <sys:String x:Key="Str_NotImplemented">This section is not implemented in this demo.</sys:String>
     <sys:String x:Key="Str_DefaultMessageTitle">Message</sys:String>
     <sys:String x:Key="Str_ConfirmTitle">Confirm</sys:String>
@@ -85,6 +90,37 @@
     <sys:String x:Key="Str_ButtonCancel">Cancel</sys:String>
     <sys:String x:Key="Str_ButtonYes">Yes</sys:String>
     <sys:String x:Key="Str_ButtonNo">No</sys:String>
+
+    <!-- Permission Dialog -->
+    <sys:String x:Key="Str_PermDialogTitle">Permission Request</sys:String>
+    <sys:String x:Key="Str_PermDialogRequesting">is requesting permission to:</sys:String>
+    <sys:String x:Key="Str_PermDialogAllow">Allow</sys:String>
+    <sys:String x:Key="Str_PermDialogDeny">Deny</sys:String>
+    <sys:String x:Key="Str_Perm_FileRead">Read Files</sys:String>
+    <sys:String x:Key="Str_Perm_FileWrite">Write Files</sys:String>
+    <sys:String x:Key="Str_Perm_FileDelete">Delete Files</sys:String>
+    <sys:String x:Key="Str_Perm_FileSystem">Full File System Access</sys:String>
+    <sys:String x:Key="Str_Perm_NetworkAccess">Network Access</sys:String>
+    <sys:String x:Key="Str_Perm_NetworkListen">Network Listen</sys:String>
+    <sys:String x:Key="Str_Perm_Network">Full Network Access</sys:String>
+    <sys:String x:Key="Str_Perm_Notification">Show Notifications</sys:String>
+    <sys:String x:Key="Str_Perm_Clipboard">Access Clipboard</sys:String>
+    <sys:String x:Key="Str_Perm_Dialog">Show Dialogs</sys:String>
+    <sys:String x:Key="Str_Perm_Overlay">Show Overlays</sys:String>
+    <sys:String x:Key="Str_Perm_UI">Full UI Access</sys:String>
+    <sys:String x:Key="Str_Perm_ProcessLaunch">Launch Other Apps</sys:String>
+    <sys:String x:Key="Str_Perm_ProcessKill">Terminate Other Apps</sys:String>
+    <sys:String x:Key="Str_Perm_SystemSettings">Modify System Settings</sys:String>
+    <sys:String x:Key="Str_Perm_SystemInfo">Access System Information</sys:String>
+    <sys:String x:Key="Str_Perm_System">Full System Access</sys:String>
+    <sys:String x:Key="Str_Perm_IpcSend">Send Messages</sys:String>
+    <sys:String x:Key="Str_Perm_IpcReceive">Receive Messages</sys:String>
+    <sys:String x:Key="Str_Perm_IpcBroadcast">Broadcast Messages</sys:String>
+    <sys:String x:Key="Str_Perm_Ipc">Full IPC Access</sys:String>
+    <sys:String x:Key="Str_Perm_Camera">Access Camera</sys:String>
+    <sys:String x:Key="Str_Perm_Microphone">Access Microphone</sys:String>
+    <sys:String x:Key="Str_Perm_Location">Access Location</sys:String>
+    <sys:String x:Key="Str_Perm_Hardware">Full Hardware Access</sys:String>
 
     <!-- Demo apps (names/descriptions) -->
     <sys:String x:Key="Str_DemoMailName">Mail</sys:String>

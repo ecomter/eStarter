@@ -87,17 +87,17 @@ namespace eStarter.ViewModels
                 // Add dummy events for demo
                 if (date.DayOfWeek == DayOfWeek.Thursday && date.Day % 2 == 0)
                 {
-                    day.Events.Add(new CalendarEvent { Title = "劳动节(第一天)", Color = Brushes.Purple });
+                    day.Events.Add(new CalendarEvent { Title = "劳动节(第一天)", Color = "#FF800080" });
                 }
                 if (date.Day == 4 && date.Month == 5)
                 {
-                    day.Events.Add(new CalendarEvent { Title = "青年节", Color = Brushes.Purple });
+                    day.Events.Add(new CalendarEvent { Title = "青年节", Color = "#FF800080" });
                 }
                 if (date.DayOfWeek == DayOfWeek.Friday && date.Day > 15)
                 {
-                    day.Events.Add(new CalendarEvent { Title = "农历 甲午年 【马年】...", Color = Brushes.Purple });
+                    day.Events.Add(new CalendarEvent { Title = "农历 甲午年 【马年】...", Color = "#FF800080" });
                     if (date.Day == 16)
-                        day.Events.Add(new CalendarEvent { Title = "早饭", Time = "6:35", Color = Brushes.CornflowerBlue });
+                        day.Events.Add(new CalendarEvent { Title = "早饭", Time = "6:35", Color = "#FF6495ED" });
                 }
 
                 Days.Add(day);

@@ -1,0 +1,18 @@
+{
+  "id": "hello.native",
+  "name": "Hello Native",
+  "description": "Sample native app for eStarter ProcessHost demo",
+  "publisher": "eStarter Samples",
+  "version": "1.0.0",
+  "category": "Samples",
+  "background": "#FF00B159",
+  "runtime": "Native",
+  "entry": "HelloNative.exe",
+  "permissions": ["FileRead", "Notification", "SystemInfo"],
+  "sandboxed": true,
+  "memoryLimitMb": 128,
+  "maxProcesses": 1,
+  "cpuQuota": 50,
+  "networkAllowed": false,
+  "maxRuntimeSeconds": 30
+}

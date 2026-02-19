@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Text.Json;
 using System.Threading.Tasks;
+using eStarter.Models;
 
 namespace eStarter.Services
 {
@@ -15,13 +17,32 @@ namespace eStarter.Services
             if (!File.Exists(packagePath))
                 throw new FileNotFoundException("Package not found", packagePath);
 
-            var fileName = Path.GetFileNameWithoutExtension(packagePath);
+            // Determine app ID: read manifest.json from the archive first,
+            // fall back to the file name without extension.
+            var appId = Path.GetFileNameWithoutExtension(packagePath);
+            try
+            {
+                using var zip = ZipFile.OpenRead(packagePath);
+                var manifestEntry = zip.GetEntry("manifest.json");
+                if (manifestEntry != null)
+                {
+                    using var stream = manifestEntry.Open();
+                    var manifest = await JsonSerializer.DeserializeAsync<AppManifest>(stream).ConfigureAwait(false);
+                    if (!string.IsNullOrWhiteSpace(manifest?.Id))
+                        appId = manifest.Id;
+                }
+            }
+            catch
+            {
+                // Could not read manifest — use filename as appId.
+            }
+
             var baseDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var targetRoot = Path.Combine(baseDir, "eStarter", "apps", fileName);
+            var targetRoot = Path.Combine(baseDir, "eStarter", "apps", appId);
 
             Directory.CreateDirectory(targetRoot);
 
-            // Extract zip into targetRoot
+            // Extract zip into targetRoot (overwrite existing files).
             await Task.Run(() => ZipFile.ExtractToDirectory(packagePath, targetRoot, true)).ConfigureAwait(false);
         }
     }
